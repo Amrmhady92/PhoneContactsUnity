@@ -19,8 +19,9 @@ public class Contact
     public string note;
 }
 
+[System.Serializable]
 public struct PhoneNumber
 {
-    public int number;
+    public string number;
     public PhoneNumberType type;
 }
