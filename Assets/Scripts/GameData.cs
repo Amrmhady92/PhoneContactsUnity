@@ -182,7 +182,7 @@ public class GameData : ScriptableObject
 
                 if(contact != null)
                 {
-                    Debug.Log("Loaded Contact: " + contact.name);
+                    //Debug.Log("Loaded Contact: " + contact.name);
                     contacts.Add(contact);
                 }
             }
@@ -200,7 +200,7 @@ public class GameData : ScriptableObject
 
         if (contact == null) return "Contact is Null";
 
-        Contact foundContact = contacts.Find(c => c.name == contact.name);
+        Contact foundContact = contacts.Find(c => c.name.ToLower() == contact.name.ToLower());
         if (foundContact != null)
         {
             Debug.LogError("Contact already exist");
@@ -253,9 +253,11 @@ public class GameData : ScriptableObject
 
         for (int i = 0; i < contacts.Count; i++)
         {
-            if (contacts[i] == null) continue;
-            found = false;
             tempContact = contacts[i];
+
+            if (tempContact == null) continue;
+
+            found = false;
 
             if (tempContact.name.Length > searchedStringLength)
             {
@@ -267,23 +269,25 @@ public class GameData : ScriptableObject
                 index = enteredText.IndexOf(tempContact.name);
                 //splitString = tempContact.name;
             }
+            Debug.Log("index for contact name " + tempContact.name + " : " + index);
+
             //If name matches
-            if (index > 0/*splitString == enteredText*/)
+            if (index >= 0/*splitString == enteredText*/)
             {
                 tempContacts.Add(tempContact);
                 continue;
             }
 
             //else Check Notes (less work than next items)
-            if (tempContact.note.Length > searchedStringLength)
+            if (tempContact.description.Length > searchedStringLength)
             {
-                index = tempContact.note.IndexOf(enteredText);
+                index = tempContact.description.IndexOf(enteredText);
             }
             else
             {
-                index = enteredText.IndexOf(tempContact.note);
+                index = enteredText.IndexOf(tempContact.description);
             }
-            if (index > 0)
+            if (index >= 0)
             {
                 tempContacts.Add(tempContact);
                 continue;
@@ -304,7 +308,7 @@ public class GameData : ScriptableObject
                     index = enteredText.IndexOf(tempContact.name);
                 }
 
-                if (index > 0)
+                if (index >= 0)
                 {
                     tempContacts.Add(tempContact);
                     found = true;
@@ -313,7 +317,7 @@ public class GameData : ScriptableObject
             }
 
             //For the break from prev forloop
-            if(found)
+            if (found)
             {
                 found = false;
                 continue;
@@ -338,7 +342,7 @@ public class GameData : ScriptableObject
                     index = enteredText.IndexOf(tempContact.name);
                 }
 
-                if (index > 0)
+                if (index >= 0)
                 {
                     tempContacts.Add(tempContact);
                     break;
@@ -347,7 +351,7 @@ public class GameData : ScriptableObject
 
         }
 
-
+        Debug.Log("Found Items " + tempContacts.Count);
         return tempContacts;
 
 

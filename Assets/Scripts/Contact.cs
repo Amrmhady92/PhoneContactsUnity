@@ -13,10 +13,12 @@ public enum PhoneNumberType
 public class Contact
 {
     public string name;
+    public string lastname;
     public List<PhoneNumber> phoneNumbers;
     public List<string> emails;
     public List<string> links;
-    public string note;
+    public string description;
+    public string dateAdded;
 }
 
 [System.Serializable]

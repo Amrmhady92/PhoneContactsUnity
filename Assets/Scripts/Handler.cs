@@ -14,7 +14,7 @@ public enum ScreenState
 public class Handler : MonoBehaviour
 {
 
-    public bool testerbool = true;
+    //public bool testerbool = true;
     [SerializeField] private Pooler contactHolderPool;
     [SerializeField] private float clickCoolDown = 0.2f;
     [SerializeField] private GameData phoneData;
@@ -74,35 +74,35 @@ public class Handler : MonoBehaviour
     private void Start()
     {
         //PlayerPrefs.DeleteAll();
-        if (testerbool)
-        {
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    Contact c = new Contact();
-            //    c.name = Random.Range(-1000, 1000).ToString();
-            //    c.phoneNumbers = new List<PhoneNumber>();
-            //    c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
-            //    c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
-            //    c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
-            //    c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
-            //    c.note = Random.Range(-1000, 1000).ToString();
+        //if (testerbool)
+        //{
+        //    string[] names = new string[] {"Amr", "Kareem" , "Hossam" , "Nada" , "Engy" , "Mohamed" , "Hala" };
+        //    for (int i = 0; i < names.Length; i++)
+        //    {
+        //        Contact c = new Contact();
+        //        c.name = names[i];
+        //        c.phoneNumbers = new List<PhoneNumber>();
+        //        c.phoneNumbers.Add(new PhoneNumber() { number = Random.Range(10000000,99999999).ToString(), type = PhoneNumberType.Mobile });
+        //        c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
+        //        c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
+        //        c.note = Random.Range(-1000, 1000).ToString();
 
-            //    phoneData.AddContact(c);
+        //        phoneData.AddContact(c);
 
-            //}
+        //    }
 
-            //Contact c = new Contact();
-            //c.name = "Amr";
-            //c.phoneNumbers = new List<PhoneNumber>();
-            //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
-            //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
-            //c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
-            //c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
-            //c.note = Random.Range(-1000, 1000).ToString();
+        //    //Contact c = new Contact();
+        //    //c.name = "Amr";
+        //    //c.phoneNumbers = new List<PhoneNumber>();
+        //    //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
+        //    //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
+        //    //c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
+        //    //c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
+        //    //c.note = Random.Range(-1000, 1000).ToString();
 
-            //phoneData.AddContact(c);
+        //    //phoneData.AddContact(c);
 
-        }
+        //}
 
 
 
@@ -117,14 +117,14 @@ public class Handler : MonoBehaviour
     private void LoadContacts()
     {
         contacts = new List<Contact>(phoneData.GetAllContacts());
-        if (contacts != null)
-        {
-            Debug.Log(contacts.Count);
-        }
-        else
-        {
-            Debug.LogError("No Contacts");
-        }
+        //if (contacts != null)
+        //{
+        //    Debug.Log(contacts.Count);
+        //}
+        //else
+        //{
+        //    Debug.LogError("No Contacts");
+        //}
     }
 
     public void OnContactClicked(Contact contact)
@@ -164,6 +164,8 @@ public class Handler : MonoBehaviour
             searchBar.LeanCancel();
             Vector2 offSize = new Vector2(0, searchBar.rect.height);
             searchBar.LeanSize(offSize, 0.2f);
+            LoadContacts();
+            UpdateContactsList();
         }
         else
         {
@@ -180,7 +182,6 @@ public class Handler : MonoBehaviour
     {
         if (!searching) return;
 
-        Debug.Log(value);
         if(value == "")
         {
             //show normal contacts
