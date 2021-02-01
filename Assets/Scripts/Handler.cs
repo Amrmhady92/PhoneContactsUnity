@@ -13,6 +13,8 @@ public enum ScreenState
 
 public class Handler : MonoBehaviour
 {
+
+    public bool testerbool = true;
     [SerializeField] private Pooler contactHolderPool;
     [SerializeField] private float clickCoolDown = 0.2f;
     [SerializeField] private GameData phoneData;
@@ -20,19 +22,21 @@ public class Handler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI noContactsText;
 
     [SerializeField] private GameObject contactsViewScreenGO;
-    [SerializeField] private GameObject contactDetailsViewScreenGO;
     [SerializeField] private GameObject createContactScreenGO;
-
     [SerializeField] private ContactScreen contactScreen;
 
 
+    [SerializeField] private Canvas gameCanvas;
+
+    //Searching
     private bool searching = false;
     [SerializeField] private RectTransform searchBar;
+    //
 
     private List<Contact> contacts;
+    private List<GameObject> activeContactHolders;
 
-
-    private Canvas gameCanvas;
+    private CanvasScaler gameCanvasScaler;
 
     private static Handler instance;
     public static Handler Instance
@@ -43,18 +47,6 @@ public class Handler : MonoBehaviour
         }
     }
 
-    public Pooler ContactHolderPool
-    {
-        get
-        {
-            return contactHolderPool;
-        }
-
-        private set
-        {
-            contactHolderPool = value;
-        }
-    }
 
     public GameData PhoneData
     {
@@ -73,66 +65,76 @@ public class Handler : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
+
+        contacts = new List<Contact>();
+        gameCanvasScaler = gameCanvas.GetComponent<CanvasScaler>();
     }
 
     private void Start()
     {
-        PhoneData.Init();
+        //PhoneData.Init();
         //PlayerPrefs.DeleteAll();
-
-        //if (PlayerPrefs.HasKey("Saved Once") == false)
-        //{
-        //    Contact c = new Contact();
-        //    c.name = "Amr";
-        //    c.phoneNumbers = new List<PhoneNumber>();
-        //    c.phoneNumbers.Add(new PhoneNumber() { number = "0700446383", type = PhoneNumberType.Mobile });
-        //    c.phoneNumbers.Add(new PhoneNumber() { number = "01145471546", type = PhoneNumberType.Home });
-        //    c.emails = new List<string>() { "amrmhady92@gmail.com", "night_raven1992" };
-        //    c.links = new List<string>() { "amrmhady92.com", "g.com" };
-        //    c.note = "Hi";
-
-
-        //    Contact c2 = new Contact();
-        //    c2.name = "Jack";
-        //    c2.phoneNumbers = new List<PhoneNumber>();
-        //    c2.phoneNumbers.Add(new PhoneNumber() { number = "070042223", type = PhoneNumberType.Mobile });
-        //    c2.phoneNumbers.Add(new PhoneNumber() { number = "0011445566", type = PhoneNumberType.Home });
-        //    c2.emails = new List<string>() { "jack@gmail.com", "jcc" };
-        //    c2.links = new List<string>() { "jack,linkedin.com" };
-        //    c2.note = "Jack is here";
-
-
-        //    phoneData.AddContact(c);
-        //    phoneData.AddContact(c2);
-        //    PlayerPrefs.SetFloat("Saved Once", 0);
-        //    PlayerPrefs.Save();
-        //}
-
-        List<Contact> allcontacts = phoneData.GetAllContacts();
-        if (allcontacts != null)
+        if (testerbool)
         {
-            Debug.Log(allcontacts.Count);
+            for (int i = 0; i < 8; i++)
+            {
+                Contact c = new Contact();
+                c.name = Random.Range(-1000, 1000).ToString();
+                c.phoneNumbers = new List<PhoneNumber>();
+                c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
+                c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
+                c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
+                c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
+                c.note = Random.Range(-1000, 1000).ToString();
+
+                phoneData.AddContact(c);
+
+            }
+
+        }
+
+
+
+
+        LoadContacts();
+        UpdateContactsList();
+
+    }
+
+
+    private void LoadContacts()
+    {
+        contacts = phoneData.GetAllContacts();
+        if (contacts != null)
+        {
+            Debug.Log(contacts.Count);
         }
         else
         {
             Debug.LogError("No Contacts");
         }
-
     }
+
     public void OnContactClicked(Contact contact)
     {
         if (canClick == false) return;
         ClickCoolDown();
         CloseAllScreens();
-        contactDetailsViewScreenGO.SetActive(true);
+        contactScreen.gameObject.SetActive(true);
+        if (contactScreen.DisplayContact(contact) == false)
+        {
+            CloseAllScreens();
+            createContactScreenGO.SetActive(true);
+        }
 
     }
 
     private void CloseAllScreens()
     {
         contactsViewScreenGO.SetActive(false);
-        contactDetailsViewScreenGO.SetActive(false);
+        contactScreen.gameObject.SetActive(false);
         createContactScreenGO.SetActive(false);
+        if (searching) OnSearchButtonPressed();
     }
 
     private void ClickCoolDown()
@@ -154,30 +156,79 @@ public class Handler : MonoBehaviour
         {
             searching = true;
             searchBar.LeanCancel();
-            Vector2 offSize = new Vector2(Screen.width * 0.7f, searchBar.rect.height); // 70% of screen width.
+            Debug.Log(/*Screen.currentResolution.height*/gameCanvasScaler.referenceResolution.x);
+            
+            Vector2 offSize = new Vector2(gameCanvasScaler.referenceResolution.x * 0.7f, searchBar.rect.height); // 70% of screen width.
             searchBar.LeanSize(offSize, 0.2f);
         }
     }
 
     public void OnSearchBarValueChanged(string value)
     {
+        if (!searching) return;
+
         if(value == "")
         {
             //show normal contacts
+            contacts = phoneData.GetAllContacts();
         }
         else
         {
-            PhoneData.GetContactsByText(value);
+            contacts = PhoneData.GetContactsByText(value);
         }
+
+        UpdateContactsList();
     }
 
     private void UpdateContactsList()
     {
         if (contacts == null) return;
+        DeactivateHolders();
+        Contact contact;
+        ContactHolder holder;
+        GameObject holderObject;
+        Debug.Log("contacts count "+ contacts.Count);
 
 
+        for (int i = 0; i < contacts.Count; i++)
+        {
+            contact = contacts[i];
+            if (contact == null) continue;
+
+            //Safety Checks
+            holderObject = contactHolderPool.Get();
+            if (holderObject == null)
+            {
+                Debug.LogError("Error getting pooled object");
+                return;
+            }
+            holder = holderObject.GetComponent<ContactHolder>();
+            if (holder == null)
+            {
+                Debug.LogError("Error getting pooled object component");
+                return;
+            }
+            //
+            Debug.Log(holder.name);
+            holder.SetConact(contact);
+            holderObject.SetActive(true);
+            activeContactHolders.Add(holderObject);
+        }
     }
 
+    private void DeactivateHolders()
+    {
+        if (activeContactHolders == null)
+        {
+            activeContactHolders = new List<GameObject>();
+            return;
+        }
+        for (int i = 0; i < activeContactHolders.Count; i++)
+        {
+            activeContactHolders[i].SetActive(false);
+        }
+        activeContactHolders.Clear();
+    }
     IEnumerator WaitThenDo(float waitTime, System.Action callback)
     {
         yield return new WaitForSeconds(waitTime);

@@ -12,28 +12,14 @@ public class GameData : ScriptableObject
 
     private ContactsSaver saver;
     private FileInfo dataFile;
-    private string directory;
+    //private string directory;
 
 
     //Must be called
     public void Init()
     {
         saver = new ContactsSaver();
-        directory = (Application.persistentDataPath + "\\" + "contactsData.txt");
-        Debug.Log(directory);
-        //dataFile = new FileInfo(directory);
         LoadData();
-        //if (dataFile.Exists)
-        //{
-        //    Debug.Log("Exists");
-        //    Load();
-        //}
-        //else
-        //{
-        //    Debug.Log("Doesnt Exist");
-        //    contacts = new List<Contact>();
-        //}
-
     }
 
     //My initial Save Load
@@ -88,23 +74,40 @@ public class GameData : ScriptableObject
     //To do -- save each contact in a file
     public void SaveData()
     {
+
+        //if (saver == null)
+        //{
+        //    saver = new ContactsSaver();
+        //}
+        //saver.contacts = contacts;
+        if (contacts == null || contacts.Count == 0) return;
+
+
+
         if (!Directory.Exists("Saves"))
             Directory.CreateDirectory("Saves");
 
         BinaryFormatter formatter = new BinaryFormatter();
-        FileStream saveFile = File.Create("Saves/save.binary");
+        string filename = "";
+        //FileStream saveFile = File.Create("Saves/save.binary");
+        FileStream saveFile = File.Create("Saves/"+ filename + ".cntct");
+        Debug.Log("saving");
 
-        if (saver == null)
-        {
-            saver = new ContactsSaver();
-        }
-        saver.contacts = contacts;
 
         formatter.Serialize(saveFile, saver);
 
         saveFile.Close();
     }
 
+    private void SaveContact(Contact contact)
+    {
+
+    }
+
+    private void RemoveSaveFile(string contactName)
+    {
+
+    }
 
 
     public void LoadData()
@@ -117,27 +120,57 @@ public class GameData : ScriptableObject
         }
 
         BinaryFormatter formatter = new BinaryFormatter();
+        var allsaves = System.IO.Directory.GetFiles("Saves",".cntct");
+
         FileStream saveFile = File.Open("Saves/save.binary", FileMode.Open);
         saver = (ContactsSaver)formatter.Deserialize(saveFile);
         saveFile.Close();
-        Debug.Log("Saver:"+saver.contacts.Count);
+        Debug.Log("Loader:"+saver.contacts.Count);
         if (saver != null) contacts = saver.contacts;
         else contacts = new List<Contact>();
     }
 
-    public void AddContact(Contact contact)
+    public string AddContact(Contact contact)
     {
         //if (!initialized) Init();
 
-        if (contact == null) return;
+        if (contact == null) return "Contact is Null";
 
-        contacts.Add(contact);
-        SaveData();
+        Contact foundContact = contacts.Find(c => c.name == contact.name);
+        if (foundContact != null)
+        {
+            Debug.LogError("Contact already exist");
+            return "Contact already exist";
+        }
+        else
+        {
+            contacts.Add(contact);
+            SaveContact(contact);
+            return "Contact added"; ;
+        }
     }
 
-    public List<Contact> GetAllContacts()
+    public bool RemoveContact(Contact contact)
     {
         LoadData();
+
+        Contact foundContact = contacts.Find(c => c.name == contact.name);
+        if(foundContact != null)
+        {
+            contacts.Remove(foundContact);
+            //SaveData();
+            RemoveSaveFile(contact.name);
+            return true;
+        }
+        else
+        {
+            Debug.LogError("Couldnt find contact to remove");
+            return false;
+        }
+    }
+    public List<Contact> GetAllContacts()
+    {
+        if(contacts == null) LoadData();
         return contacts;
     }
 
@@ -151,10 +184,10 @@ public class GameData : ScriptableObject
     int index;
     Contact tempContact;
 
-
-
     public List<Contact> GetContactsByText(string enteredText)
     {
+        if (contacts == null) LoadData();
+
         tempContacts.Clear();
         tempEmailsAndLinks.Clear();
         searchedStringLength = enteredText.Length;
@@ -260,53 +293,6 @@ public class GameData : ScriptableObject
 
 
     }
-
-
-    //public Contact GetContact(string name)
-    //{
-    //    return contacts.Find(c => c.name == name);
-    //}
-    //public Contact GetContact(int index)
-    //{
-    //    if (index > contacts.Count || index < 0) return null;
-    //    return contacts[index];
-    //}
-
-    //public List<Contact> GetContacts(string name)
-    //{
-    //    return contacts.FindAll(c => c.name == name);
-    //}
-
-    //This is usless I guess
-    //public List<Contact> GetContacts(int phoneNumber)
-    //{
-    //    tempContacts.Clear();
-    //    string enteredText = phoneNumber.ToString();
-    //    for (int j = 0; j < tempContact.phoneNumbers.Count; j++)
-    //    {
-    //        searchedString = tempContact.phoneNumbers[j].number.ToString();
-    //        if (searchedString.Length > searchedStringLength)
-    //        {
-    //            //splitString = searchedString.Substring(0, searchedStringLength);
-    //            index = searchedString.IndexOf(enteredText);
-    //        }
-    //        else
-    //        {
-    //            //splitString = searchedString;
-    //            index = enteredText.IndexOf(tempContact.name);
-    //        }
-
-    //        if (index > 0)
-    //        {
-    //            tempContacts.Add(tempContact);
-    //            found = true;
-    //            break;
-    //        }
-    //    }
-    //    return tempContacts;
-    //    //return contacts.FindAll(c => c.phoneNumbers.Find(x => x.number == phoneNumber).number == phoneNumber);
-    //}
-
 
 }
 

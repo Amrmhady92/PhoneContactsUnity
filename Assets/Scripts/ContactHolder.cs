@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class ContactHolder : MonoBehaviour
@@ -29,8 +30,11 @@ public class ContactHolder : MonoBehaviour
         {
             contactMainNumberText.text = "";
         }
+
+
         return true;
     }
+
 
     private void OnMouseDown() 
     {

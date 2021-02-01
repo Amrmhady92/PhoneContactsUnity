@@ -22,10 +22,10 @@ public class Pooler : MonoBehaviour
         {
             pooledObject = value;
             pool = new List<GameObject>();
-            if (parentObject != null) Destroy(parentObject);
-            parentObject = new GameObject(pooledObject.name + " Pool");
-            parentObject.transform.parent = this.transform;
-            parentObject.transform.localPosition = Vector3.zero;
+            //if (parentObject != null) Destroy(parentObject);
+            parentObject = this.gameObject;//new GameObject(pooledObject.name + " Pool");
+           // parentObject.transform.parent = this.transform;
+           // parentObject.transform.localPosition = Vector3.zero;
 
             GameObject newObj;
             for (int i = 0; i < startAmount; i++)
@@ -59,9 +59,9 @@ public class Pooler : MonoBehaviour
 
         if (parentObject == null)
         {
-            parentObject = new GameObject(PooledObject.name + " Pool");
-            parentObject.transform.parent = this.transform;
-            parentObject.transform.localPosition = Vector3.zero;
+            parentObject = this.gameObject;//new GameObject(PooledObject.name + " Pool");
+            //parentObject.transform.parent = this.transform;
+            //parentObject.transform.localPosition = Vector3.zero;
         }
 
         GameObject newObj = Instantiate(PooledObject, parentObject.transform);
