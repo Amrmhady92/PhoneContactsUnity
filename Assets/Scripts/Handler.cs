@@ -68,28 +68,39 @@ public class Handler : MonoBehaviour
 
         contacts = new List<Contact>();
         gameCanvasScaler = gameCanvas.GetComponent<CanvasScaler>();
+        PhoneData.Init();
     }
 
     private void Start()
     {
-        //PhoneData.Init();
         //PlayerPrefs.DeleteAll();
         if (testerbool)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                Contact c = new Contact();
-                c.name = Random.Range(-1000, 1000).ToString();
-                c.phoneNumbers = new List<PhoneNumber>();
-                c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
-                c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
-                c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
-                c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
-                c.note = Random.Range(-1000, 1000).ToString();
+            //for (int i = 0; i < 8; i++)
+            //{
+            //    Contact c = new Contact();
+            //    c.name = Random.Range(-1000, 1000).ToString();
+            //    c.phoneNumbers = new List<PhoneNumber>();
+            //    c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
+            //    c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
+            //    c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
+            //    c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
+            //    c.note = Random.Range(-1000, 1000).ToString();
 
-                phoneData.AddContact(c);
+            //    phoneData.AddContact(c);
 
-            }
+            //}
+
+            //Contact c = new Contact();
+            //c.name = "Amr";
+            //c.phoneNumbers = new List<PhoneNumber>();
+            //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
+            //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
+            //c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
+            //c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
+            //c.note = Random.Range(-1000, 1000).ToString();
+
+            //phoneData.AddContact(c);
 
         }
 
@@ -99,12 +110,13 @@ public class Handler : MonoBehaviour
         LoadContacts();
         UpdateContactsList();
 
+
     }
 
 
     private void LoadContacts()
     {
-        contacts = phoneData.GetAllContacts();
+        contacts = new List<Contact>(phoneData.GetAllContacts());
         if (contacts != null)
         {
             Debug.Log(contacts.Count);
@@ -127,6 +139,7 @@ public class Handler : MonoBehaviour
             createContactScreenGO.SetActive(true);
         }
 
+        Debug.Log("ContactClicked");
     }
 
     private void CloseAllScreens()
@@ -167,13 +180,15 @@ public class Handler : MonoBehaviour
     {
         if (!searching) return;
 
+        Debug.Log(value);
         if(value == "")
         {
             //show normal contacts
-            contacts = phoneData.GetAllContacts();
+            LoadContacts();
         }
         else
         {
+            //can use this list.. (is actually tempContacts in phoneData
             contacts = PhoneData.GetContactsByText(value);
         }
 
@@ -187,8 +202,6 @@ public class Handler : MonoBehaviour
         Contact contact;
         ContactHolder holder;
         GameObject holderObject;
-        Debug.Log("contacts count "+ contacts.Count);
-
 
         for (int i = 0; i < contacts.Count; i++)
         {
@@ -209,7 +222,7 @@ public class Handler : MonoBehaviour
                 return;
             }
             //
-            Debug.Log(holder.name);
+            //Debug.Log(holder.name);
             holder.SetConact(contact);
             holderObject.SetActive(true);
             activeContactHolders.Add(holderObject);

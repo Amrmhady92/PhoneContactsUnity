@@ -24,7 +24,7 @@ public class ContactHolder : MonoBehaviour
         contactNameText.text = contact.name;
         if (contact.phoneNumbers != null && contact.phoneNumbers.Count > 0)
         {
-            contactMainNumberText.text = contact.phoneNumbers[0].ToString();
+            contactMainNumberText.text = contact.phoneNumbers[0].number.ToString();
         }
         else
         {

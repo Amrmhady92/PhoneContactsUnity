@@ -22,7 +22,7 @@ public class GameData : ScriptableObject
         LoadData();
     }
 
-    //My initial Save Load
+    //My initial Save Load using JSON, can test later to see which is faster
     private void Save()
     {
         Debug.Log("Saving");
@@ -72,44 +72,87 @@ public class GameData : ScriptableObject
     //https://www.sitepoint.com/saving-and-loading-player-game-data-in-unity/
 
     //To do -- save each contact in a file
-    public void SaveData()
-    {
+    //public void SaveData()
+    //{
 
-        //if (saver == null)
-        //{
-        //    saver = new ContactsSaver();
-        //}
-        //saver.contacts = contacts;
+    //    //if (saver == null)
+    //    //{
+    //    //    saver = new ContactsSaver();
+    //    //}
+    //    //saver.contacts = contacts;
+    //    if (contacts == null || contacts.Count == 0) return;
+
+
+
+    //    if (!Directory.Exists("Saves"))
+    //        Directory.CreateDirectory("Saves");
+
+    //    BinaryFormatter formatter = new BinaryFormatter();
+    //    string filename = "";
+    //    //FileStream saveFile = File.Create("Saves/save.binary");
+    //    FileStream saveFile = File.Create("Saves/"+ filename + ".cntct");
+    //    Debug.Log("saving");
+
+
+    //    formatter.Serialize(saveFile, saver);
+
+    //    saveFile.Close();
+    //}
+
+    private void SaveContact(Contact contact)
+    {
         if (contacts == null || contacts.Count == 0) return;
 
+        int index = contacts.Count;
 
 
         if (!Directory.Exists("Saves"))
             Directory.CreateDirectory("Saves");
 
         BinaryFormatter formatter = new BinaryFormatter();
-        string filename = "";
-        //FileStream saveFile = File.Create("Saves/save.binary");
-        FileStream saveFile = File.Create("Saves/"+ filename + ".cntct");
-        Debug.Log("saving");
-
-
-        formatter.Serialize(saveFile, saver);
-
+        string filename = contact.GetHashCode().ToString();//contact.name;//contact.GetHashCode().ToString();
+        FileStream saveFile = File.Create("Saves/" + filename + ".cntct");
+        formatter.Serialize(saveFile, contact);
         saveFile.Close();
-    }
-
-    private void SaveContact(Contact contact)
-    {
-
     }
 
     private void RemoveSaveFile(string contactName)
     {
+        if (!Directory.Exists("Saves"))
+        {
+            Debug.Log("Nothing to load");
+            contacts = new List<Contact>();
+            return;
+        }
 
+        string[] allsaves = System.IO.Directory.GetFiles(@"Saves", "*.cntct"); // my own extentions
+        if (allsaves.Length > 0)
+        {
+            FileStream saveFile;
+            BinaryFormatter formatter;
+            Contact contact;
+            for (int i = 0; i < allsaves.Length; i++)
+            {
+                formatter = new BinaryFormatter();
+                saveFile = File.Open(allsaves[i], FileMode.Open);
+                contact = (Contact)formatter.Deserialize(saveFile);
+                saveFile.Close();
+
+
+                if (contact != null)
+                {
+                    if(contact.name.ToLower() == contactName.ToLower())
+                    {
+                        File.Delete(allsaves[i]);
+                        Debug.Log("Found and Deleted " + contactName);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
-
+    //Only needed to load at start, all contacts are stored under contacts list
     public void LoadData()
     {
         if (!Directory.Exists("Saves"))
@@ -119,15 +162,36 @@ public class GameData : ScriptableObject
             return;
         }
 
-        BinaryFormatter formatter = new BinaryFormatter();
-        var allsaves = System.IO.Directory.GetFiles("Saves",".cntct");
+        if (contacts == null) contacts = new List<Contact>();
+        else contacts.Clear();
+        
+        string[] allsaves = System.IO.Directory.GetFiles(@"Saves","*.cntct"); // my own extentions
+        
+        if (allsaves.Length > 0)
+        {
+            FileStream saveFile;
+            BinaryFormatter formatter;
+            Contact contact;
+            for (int i = 0; i < allsaves.Length; i++)
+            {
+                formatter = new BinaryFormatter();
+                saveFile = File.Open(allsaves[i], FileMode.Open);
+                contact = (Contact)formatter.Deserialize(saveFile);
+                saveFile.Close();
 
-        FileStream saveFile = File.Open("Saves/save.binary", FileMode.Open);
-        saver = (ContactsSaver)formatter.Deserialize(saveFile);
-        saveFile.Close();
-        Debug.Log("Loader:"+saver.contacts.Count);
-        if (saver != null) contacts = saver.contacts;
-        else contacts = new List<Contact>();
+
+                if(contact != null)
+                {
+                    Debug.Log("Loaded Contact: " + contact.name);
+                    contacts.Add(contact);
+                }
+            }
+        }
+        //if (saver != null) contacts = saver.contacts;
+        //else contacts = new List<Contact>();
+
+        //FileStream saveFile = File.Open("Saves/save.binary", FileMode.Open);
+
     }
 
     public string AddContact(Contact contact)
@@ -146,14 +210,12 @@ public class GameData : ScriptableObject
         {
             contacts.Add(contact);
             SaveContact(contact);
-            return "Contact added"; ;
+            return "Contact added";
         }
     }
 
     public bool RemoveContact(Contact contact)
     {
-        LoadData();
-
         Contact foundContact = contacts.Find(c => c.name == contact.name);
         if(foundContact != null)
         {
@@ -170,7 +232,6 @@ public class GameData : ScriptableObject
     }
     public List<Contact> GetAllContacts()
     {
-        if(contacts == null) LoadData();
         return contacts;
     }
 
@@ -186,8 +247,6 @@ public class GameData : ScriptableObject
 
     public List<Contact> GetContactsByText(string enteredText)
     {
-        if (contacts == null) LoadData();
-
         tempContacts.Clear();
         tempEmailsAndLinks.Clear();
         searchedStringLength = enteredText.Length;
