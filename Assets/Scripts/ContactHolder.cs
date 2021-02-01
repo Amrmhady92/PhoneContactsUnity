@@ -36,8 +36,10 @@ public class ContactHolder : MonoBehaviour
     }
 
 
-    private void OnMouseDown() 
+
+    public void OnHolderClicked()
     {
         Handler.Instance.OnContactClicked(contact);
     }
+
 }

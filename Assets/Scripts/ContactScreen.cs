@@ -13,7 +13,6 @@ public class ContactScreen : MonoBehaviour
         if (contact == null) return false;
 
 
-
         return true;
 
     }

@@ -11,10 +11,19 @@ public enum ScreenState
     ContactCreationScreen
 }
 
+public enum SortMethod
+{
+    AlphabeticallyA,
+    AlphabeticallyD,
+    DateA,
+    DateD,
+    Count
+}
+
 public class Handler : MonoBehaviour
 {
 
-    //public bool testerbool = true;
+    public bool testerbool = true;
     [SerializeField] private Pooler contactHolderPool;
     [SerializeField] private float clickCoolDown = 0.2f;
     [SerializeField] private GameData phoneData;
@@ -31,7 +40,10 @@ public class Handler : MonoBehaviour
     //Searching
     private bool searching = false;
     [SerializeField] private RectTransform searchBar;
+    private SortMethod currentSortMethod = SortMethod.DateD;
     //
+    //
+    [SerializeField] private TextMeshProUGUI sortingButtonText;
 
     private List<Contact> contacts;
     private List<GameObject> activeContactHolders;
@@ -76,55 +88,88 @@ public class Handler : MonoBehaviour
         //PlayerPrefs.DeleteAll();
         //if (testerbool)
         //{
-        //    string[] names = new string[] {"Amr", "Kareem" , "Hossam" , "Nada" , "Engy" , "Mohamed" , "Hala" };
+        //    string[] names = new string[] { "Amr", "Kareem", "Hossam", "Nada", "Engy", "Mohamed", "Hala" };
+        //    string[] namesL = new string[] { "Saleh", "Mohamed", "Abdelhady", "Mohamed", "Saleh", "Radwan", "ElSafy" };
         //    for (int i = 0; i < names.Length; i++)
         //    {
         //        Contact c = new Contact();
         //        c.name = names[i];
+        //        c.lastname = namesL[i];
         //        c.phoneNumbers = new List<PhoneNumber>();
-        //        c.phoneNumbers.Add(new PhoneNumber() { number = Random.Range(10000000,99999999).ToString(), type = PhoneNumberType.Mobile });
+        //        c.phoneNumbers.Add(new PhoneNumber() { number = Random.Range(10000000, 99999999).ToString(), type = PhoneNumberType.Mobile });
         //        c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
         //        c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
-        //        c.note = Random.Range(-1000, 1000).ToString();
-
+        //        c.description = Random.Range(-1000, 1000).ToString();
+        //        c.dateAdded = new System.DateTime(Random.Range(2000,2020), Random.Range(1, 12), Random.Range(1, 30));
+        //        Debug.Log(c.dateAdded);
         //        phoneData.AddContact(c);
 
         //    }
-
-        //    //Contact c = new Contact();
-        //    //c.name = "Amr";
-        //    //c.phoneNumbers = new List<PhoneNumber>();
-        //    //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Mobile });
-        //    //c.phoneNumbers.Add(new PhoneNumber() { number = "Random.Range(-1000,1000).ToString()", type = PhoneNumberType.Home });
-        //    //c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
-        //    //c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
-        //    //c.note = Random.Range(-1000, 1000).ToString();
-
-        //    //phoneData.AddContact(c);
-
         //}
+
 
 
 
 
         LoadContacts();
-        UpdateContactsList();
-
-
+        //UpdateContactsList();
+        OnSortButtonPressed();
     }
 
 
+
+    public void SortContacts(SortMethod sortMethod)
+    {
+
+        if(contacts != null && contacts.Count > 0)
+        {
+            switch (sortMethod)
+            {
+                case SortMethod.AlphabeticallyA:
+                    contacts.Sort((a, b) => a.name.CompareTo(b.name));
+                    break;
+                case SortMethod.AlphabeticallyD:
+                    contacts.Sort((a, b) => b.name.CompareTo(a.name));
+                    break;
+                case SortMethod.DateA:
+                    contacts.Sort((a, b) => a.dateAdded.CompareTo(b.dateAdded));
+                    break;
+                case SortMethod.DateD:
+                    contacts.Sort((a, b) => b.dateAdded.CompareTo(a.dateAdded));
+                    break;
+            }
+        }
+
+        UpdateContactsList(); 
+    }
+
+
+    public void OnSortButtonPressed()
+    {
+        int sortIndex = (int)currentSortMethod;
+        sortIndex++;
+        if (sortIndex == (int)SortMethod.Count) sortIndex = 0;
+        currentSortMethod = (SortMethod)sortIndex;
+        switch (currentSortMethod)
+        {
+            case SortMethod.AlphabeticallyA:
+                sortingButtonText.text = "Alph a";
+                break;
+            case SortMethod.AlphabeticallyD:
+                sortingButtonText.text = "Alph D";
+                break;
+            case SortMethod.DateA:
+                sortingButtonText.text = "Date a";
+                break;
+            case SortMethod.DateD:
+                sortingButtonText.text = "Date D";
+                break;
+        }
+        SortContacts(currentSortMethod);
+    }
     private void LoadContacts()
     {
         contacts = new List<Contact>(phoneData.GetAllContacts());
-        //if (contacts != null)
-        //{
-        //    Debug.Log(contacts.Count);
-        //}
-        //else
-        //{
-        //    Debug.LogError("No Contacts");
-        //}
     }
 
     public void OnContactClicked(Contact contact)
@@ -186,14 +231,15 @@ public class Handler : MonoBehaviour
         {
             //show normal contacts
             LoadContacts();
+           // SortContacts(currentSortMethod); // this already Updates List
         }
         else
         {
             //can use this list.. (is actually tempContacts in phoneData
             contacts = PhoneData.GetContactsByText(value);
+           // UpdateContactsList();
         }
-
-        UpdateContactsList();
+        SortContacts(currentSortMethod); // Sorts and updates
     }
 
     private void UpdateContactsList()

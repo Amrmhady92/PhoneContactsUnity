@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public enum PhoneNumberType
 {
@@ -18,7 +19,7 @@ public class Contact
     public List<string> emails;
     public List<string> links;
     public string description;
-    public string dateAdded;
+    public DateTime dateAdded;
 }
 
 [System.Serializable]
@@ -27,3 +28,4 @@ public struct PhoneNumber
     public string number;
     public PhoneNumberType type;
 }
+
