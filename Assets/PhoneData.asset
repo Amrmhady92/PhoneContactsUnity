@@ -12,4 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d3b7c85cdbcd60438a17aa9956a6d96, type: 3}
   m_Name: PhoneData
   m_EditorClassIdentifier: 
-  contacts: []
+  contacts:
+  - name: Amr
+    phoneNumbers:
+    - number: 0700446383
+      type: 0
+    - number: 01145471546
+      type: 2
+    emails:
+    - amrmhady92@gmail.com
+    - night_raven1992
+    links:
+    - amrmhady92.com
+    - g.com
+    note: Hi
+  - name: Jack
+    phoneNumbers:
+    - number: 070042223
+      type: 0
+    - number: 0011445566
+      type: 2
+    emails:
+    - jack@gmail.com
+    - jcc
+    links:
+    - jack,linkedin.com
+    note: Jack is here

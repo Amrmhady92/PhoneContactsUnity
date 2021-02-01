@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public enum ScreenState
 {
@@ -11,14 +13,27 @@ public enum ScreenState
 
 public class Handler : MonoBehaviour
 {
-    [SerializeField] private Pooler contactDetailPool;
+    [SerializeField] private Pooler contactHolderPool;
     [SerializeField] private float clickCoolDown = 0.2f;
     [SerializeField] private GameData phoneData;
 
+    [SerializeField] private TextMeshProUGUI noContactsText;
+
+    [SerializeField] private GameObject contactsViewScreenGO;
+    [SerializeField] private GameObject contactDetailsViewScreenGO;
+    [SerializeField] private GameObject createContactScreenGO;
+
+    [SerializeField] private ContactScreen contactScreen;
 
 
-    
-    
+    private bool searching = false;
+    [SerializeField] private RectTransform searchBar;
+
+    private List<Contact> contacts;
+
+
+    private Canvas gameCanvas;
+
     private static Handler instance;
     public static Handler Instance
     {
@@ -28,16 +43,16 @@ public class Handler : MonoBehaviour
         }
     }
 
-    public Pooler ContactDetailPool
+    public Pooler ContactHolderPool
     {
         get
         {
-            return contactDetailPool;
+            return contactHolderPool;
         }
 
         private set
         {
-            contactDetailPool = value;
+            contactHolderPool = value;
         }
     }
 
@@ -92,7 +107,7 @@ public class Handler : MonoBehaviour
         //    PlayerPrefs.SetFloat("Saved Once", 0);
         //    PlayerPrefs.Save();
         //}
-        
+
         List<Contact> allcontacts = phoneData.GetAllContacts();
         if (allcontacts != null)
         {
@@ -108,13 +123,59 @@ public class Handler : MonoBehaviour
     {
         if (canClick == false) return;
         ClickCoolDown();
+        CloseAllScreens();
+        contactDetailsViewScreenGO.SetActive(true);
 
+    }
+
+    private void CloseAllScreens()
+    {
+        contactsViewScreenGO.SetActive(false);
+        contactDetailsViewScreenGO.SetActive(false);
+        createContactScreenGO.SetActive(false);
     }
 
     private void ClickCoolDown()
     {
         canClick = false;
         StartCoroutine(WaitThenDo(clickCoolDown, () => { canClick = true; }));
+    }
+
+    public void OnSearchButtonPressed()
+    {
+        if (searching)
+        {
+            searching = false;
+            searchBar.LeanCancel();
+            Vector2 offSize = new Vector2(0, searchBar.rect.height);
+            searchBar.LeanSize(offSize, 0.2f);
+        }
+        else
+        {
+            searching = true;
+            searchBar.LeanCancel();
+            Vector2 offSize = new Vector2(Screen.width * 0.7f, searchBar.rect.height); // 70% of screen width.
+            searchBar.LeanSize(offSize, 0.2f);
+        }
+    }
+
+    public void OnSearchBarValueChanged(string value)
+    {
+        if(value == "")
+        {
+            //show normal contacts
+        }
+        else
+        {
+            PhoneData.GetContactsByText(value);
+        }
+    }
+
+    private void UpdateContactsList()
+    {
+        if (contacts == null) return;
+
+
     }
 
     IEnumerator WaitThenDo(float waitTime, System.Action callback)

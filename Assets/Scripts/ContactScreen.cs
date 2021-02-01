@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ContactScreen : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private Pooler contactDetailsPool;
 
-    // Update is called once per frame
-    void Update()
+    public bool DisplayContact(Contact contact)
     {
-        
+        if (contact == null) return false;
+
+
+
+        return true;
+
     }
 }

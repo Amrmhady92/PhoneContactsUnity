@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "SOs/GameData")]
@@ -17,22 +18,25 @@ public class GameData : ScriptableObject
     //Must be called
     public void Init()
     {
-
+        saver = new ContactsSaver();
         directory = (Application.persistentDataPath + "\\" + "contactsData.txt");
-        dataFile = new FileInfo(directory);
-        if (dataFile.Exists)
-        {
-            Debug.Log("Exists");
-            Load();
-        }
-        else
-        {
-            Debug.Log("Doesnt Exist");
-            contacts = new List<Contact>();
-        }
+        Debug.Log(directory);
+        //dataFile = new FileInfo(directory);
+        LoadData();
+        //if (dataFile.Exists)
+        //{
+        //    Debug.Log("Exists");
+        //    Load();
+        //}
+        //else
+        //{
+        //    Debug.Log("Doesnt Exist");
+        //    contacts = new List<Contact>();
+        //}
 
     }
 
+    //My initial Save Load
     private void Save()
     {
         Debug.Log("Saving");
@@ -78,6 +82,49 @@ public class GameData : ScriptableObject
         contacts = new List<Contact>(saver.contacts);
     }
 
+    //SaveData() & LoadData() Code used from 
+    //https://www.sitepoint.com/saving-and-loading-player-game-data-in-unity/
+
+    //To do -- save each contact in a file
+    public void SaveData()
+    {
+        if (!Directory.Exists("Saves"))
+            Directory.CreateDirectory("Saves");
+
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream saveFile = File.Create("Saves/save.binary");
+
+        if (saver == null)
+        {
+            saver = new ContactsSaver();
+        }
+        saver.contacts = contacts;
+
+        formatter.Serialize(saveFile, saver);
+
+        saveFile.Close();
+    }
+
+
+
+    public void LoadData()
+    {
+        if (!Directory.Exists("Saves"))
+        {
+            Debug.Log("Nothing to load");
+            contacts = new List<Contact>();
+            return;
+        }
+
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream saveFile = File.Open("Saves/save.binary", FileMode.Open);
+        saver = (ContactsSaver)formatter.Deserialize(saveFile);
+        saveFile.Close();
+        Debug.Log("Saver:"+saver.contacts.Count);
+        if (saver != null) contacts = saver.contacts;
+        else contacts = new List<Contact>();
+    }
+
     public void AddContact(Contact contact)
     {
         //if (!initialized) Init();
@@ -85,12 +132,12 @@ public class GameData : ScriptableObject
         if (contact == null) return;
 
         contacts.Add(contact);
-        Save();
+        SaveData();
     }
 
     public List<Contact> GetAllContacts()
     {
-        Load();
+        LoadData();
         return contacts;
     }
 
@@ -263,7 +310,7 @@ public class GameData : ScriptableObject
 
 }
 
-
+[System.Serializable]
 public class ContactsSaver
 {
     public List<Contact> contacts;

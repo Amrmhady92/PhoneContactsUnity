@@ -10,10 +10,6 @@ public class ContactHolder : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI contactNameText;
     [SerializeField] private TextMeshProUGUI contactMainNumberText;
-    [SerializeField] private TextMeshProUGUI contactNotesText;
-
-
-
 
     public bool SetConact(Contact c)
     {
@@ -29,21 +25,10 @@ public class ContactHolder : MonoBehaviour
         {
             contactMainNumberText.text = contact.phoneNumbers[0].ToString();
         }
-
-        for (int i = 0; i < contact.phoneNumbers.Count; i++)
+        else
         {
-
+            contactMainNumberText.text = "";
         }
-        for (int i = 0; i < contact.emails.Count; i++)
-        {
-
-        }
-        for (int i = 0; i < contact.links.Count; i++)
-        {
-
-        }
-        contactNotesText.text = contact.note;
-
         return true;
     }
 
