@@ -28,7 +28,7 @@ public class ContactDetail : MonoBehaviour
                 detailValueText.text = contact.name + " " + contact.lastname;
                 break;
             case DetailType.Phone:
-                if (index > contact.phoneNumbers.Count || index < 0) return false;
+                if (index > contact.phoneNumbers.Count && index < 0) return false;
                 num = "";
                 //If there are more mobile/home etc. put the number of it next to "Mobile : " etc.
                 if (contact.phoneNumbers.Count > 1)
@@ -54,7 +54,7 @@ public class ContactDetail : MonoBehaviour
                 detailValueText.text = contact.phoneNumbers[index].number;
                 return true;
             case DetailType.Email:
-                if (index > contact.emails.Count || index < 0) return false;
+                if (index > contact.emails.Count && index < 0) return false;
                  num = "";
                 //If there are more mobile/home etc. put the number of it next to "Mobile : " etc.
                 if (contact.emails.Count > 1)
@@ -77,7 +77,7 @@ public class ContactDetail : MonoBehaviour
                 detailValueText.text = contact.emails[index];
                 return true;
             case DetailType.Link:
-                if (index > contact.links.Count || index < 0) return false;
+                if (index > contact.links.Count && index < 0) return false;
                 num = "";
                 //If there are more mobile/home etc. put the number of it next to "Mobile : " etc.
                 if (contact.links.Count > 1)
@@ -122,7 +122,7 @@ public class ContactDetail : MonoBehaviour
                 //https://stackoverflow.com/questions/48906129/make-phone-call-in-unity?noredirect=1&lq=1
 
 
-                string phoneNum =  detailValueText.text;
+                string phoneNum = "" + detailValueText.text;
 
                 ////For accessing static strings(ACTION_CALL) from android.content.Intent
                 //AndroidJavaClass intentStaticClass = new AndroidJavaClass("android.content.Intent");

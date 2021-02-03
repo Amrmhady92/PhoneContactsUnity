@@ -6,7 +6,6 @@ public class UIFitterHandler : MonoBehaviour
 {
     private static List<UIFitter> fitterObjects;
 
-    private Canvas gameCanvas;
     private static float width = 1920;
     private static float height = 1080;
     private bool change = false;

@@ -9,9 +9,9 @@ public class ContactScreen : MonoBehaviour
     [SerializeField] private Pooler contactDetailsPool;
 
     private List<GameObject> activeObjects;
-    ContactDetail cDetail = null;
-    GameObject detailObject = null;
-    Contact contact;
+    private ContactDetail cDetail = null;
+    private GameObject detailObject = null;
+    private Contact contact;
     public bool DisplayContact(Contact contact)
     {
         if(contactDetailsPool == null)
@@ -43,7 +43,6 @@ public class ContactScreen : MonoBehaviour
         //Phones
         for (int i = 0; i < contact.phoneNumbers.Count; i++)
         {
-            Debug.Log(contact.phoneNumbers.Count);
             if (MakeContact(DetailType.Phone, i) == false)
             {
                 Debug.LogError("Failed to Create Detail");
@@ -113,5 +112,19 @@ public class ContactScreen : MonoBehaviour
         }
 
         return true;
+    }
+
+    public void OnDeleteContactButtonPressed()
+    {
+        
+    }
+
+    public void OnEditContactButtonPressed()
+    {
+        Handler.Instance.CurrentState = ScreenState.ContactCreationScreen;
+        if (Handler.Instance.CreateContactScreen.CreateContactWindow(contact) == false)
+        {
+            Handler.Instance.CurrentState = ScreenState.MainMenu;
+        }
     }
 }

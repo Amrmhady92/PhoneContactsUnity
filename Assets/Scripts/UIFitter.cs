@@ -28,6 +28,7 @@ public class UIFitter : MonoBehaviour
         UIFitterHandler.AddToFitter(this);
         rectTransform = this.GetComponent<RectTransform>();
         element = this.GetComponent<LayoutElement>();
+
     }
     public void UpdateFitter()
     {

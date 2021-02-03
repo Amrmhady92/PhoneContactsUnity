@@ -20,6 +20,27 @@ public class Contact
     public List<string> links;
     public string description;
     public DateTime dateAdded;
+
+    public Contact(Contact c = null)
+    {
+        this.name = c.name;
+        this.lastname = c.lastname;
+        this.phoneNumbers = new List<PhoneNumber>(c.phoneNumbers);
+        this.emails = new List<string>(c.emails);
+        this.links = new List<string>(c.links);
+        this.description = c.description;
+        this.dateAdded = c.dateAdded;
+    }
+    public Contact()
+    {
+        this.name = "";
+        this.lastname = "";
+        this.phoneNumbers = new List<PhoneNumber>();
+        this.emails = new List<string>();
+        this.links = new List<string>();
+        this.description = "";
+        this.dateAdded = DateTime.Today;
+    }
 }
 
 [System.Serializable]

@@ -40,6 +40,7 @@ public class Handler : MonoBehaviour
     [SerializeField] private UIMover[] contactCreationScreenMovers;
 
     [SerializeField] private ContactScreen contactScreen;
+    [SerializeField] private CreateContactScreen createContactScreen;
 
 
     [SerializeField] private Canvas gameCanvas;
@@ -90,7 +91,7 @@ public class Handler : MonoBehaviour
             return currentState;
         }
 
-        private set
+        set
         {
             currentState = value;
             switch (currentState)
@@ -124,6 +125,19 @@ public class Handler : MonoBehaviour
                 default:
                     break;
             }
+        }
+    }
+
+    public CreateContactScreen CreateContactScreen
+    {
+        get
+        {
+            return createContactScreen;
+        }
+
+        private set
+        {
+            createContactScreen = value;
         }
     }
 
@@ -161,6 +175,8 @@ public class Handler : MonoBehaviour
 
     private void Start()
     {
+        PhoneData.Init();
+
         //CurrentState = ScreenState.MainMenu;
         //for (int i = 0; i < contactViewScreenMovers.Length; i++)
         //{
@@ -170,10 +186,9 @@ public class Handler : MonoBehaviour
         //{
         //    contactCreationScreenMovers[i].gameObject.SetActive(false);
         //}
-        HideMovers(contactViewScreenMovers, 0);
-        HideMovers(contactCreationScreenMovers, 0);
+        //HideMovers(contactViewScreenMovers, 0);
+        //HideMovers(contactCreationScreenMovers, 0);
 
-        PhoneData.Init();
 
         //LoadContacts();
 
@@ -230,21 +245,9 @@ public class Handler : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape))
+        if ((Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape)) && CurrentState == ScreenState.ContactDetailScreen)
         {
-            switch (CurrentState)
-            {
-                case ScreenState.MainMenu:
-                    break;
-                case ScreenState.ContactDetailScreen:
-                    CurrentState = ScreenState.MainMenu;
-                    break;
-                case ScreenState.ContactCreationScreen:
-                    CurrentState = ScreenState.MainMenu;
-                    break;
-                default:
-                    break;
-            };
+            CurrentState = ScreenState.MainMenu;
         }
         //if (Input.GetKeyDown(KeyCode.D))
         //{
@@ -386,20 +389,29 @@ public class Handler : MonoBehaviour
     public void OnContactClicked(Contact contact)
     {
         if (ClickCoolDown() == false) return;
+        if (searching) OnSearchButtonPressed();
 
         CurrentState = ScreenState.ContactDetailScreen;
         //CloseAllScreens();
-        contactScreen.gameObject.SetActive(true);
+       // contactScreen.gameObject.SetActive(true);
         if (contactScreen.DisplayContact(contact) == false)
         {
             CurrentState = ScreenState.MainMenu;
             //CloseAllScreens();
-            createContactScreenGO.SetActive(true);
+           // createContactScreenGO.SetActive(true);
         }
-
-        Debug.Log("ContactClicked");
     }
 
+    public void OnCreateContactClicked()
+    {
+        if (ClickCoolDown() == false) return;
+        if (searching) OnSearchButtonPressed();
+        CurrentState = ScreenState.ContactCreationScreen;
+
+        //createContactScreen.
+
+        
+    }
 
     public void OnSearchButtonPressed()
     {
