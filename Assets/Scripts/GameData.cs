@@ -15,12 +15,7 @@ public class GameData : ScriptableObject
     //private string directory;
 
 
-    //Must be called
-    public void Init()
-    {
-        //saver = new ContactsSaver();
-        LoadData();
-    }
+
 
     //My initial Save Load using JSON, can test later to see which is faster
     private void Save()
@@ -99,6 +94,12 @@ public class GameData : ScriptableObject
     //    saveFile.Close();
     //}
 
+    //Must be called
+    public void Init()
+    {
+        //saver = new ContactsSaver();
+        LoadData();
+    }
     private void SaveContact(Contact contact)
     {
         if (contacts == null || contacts.Count == 0) return;
@@ -106,26 +107,25 @@ public class GameData : ScriptableObject
         int index = contacts.Count;
 
 
-        if (!Directory.Exists("Saves"))
-            Directory.CreateDirectory("Saves");
+        if (!Directory.Exists(Application.persistentDataPath + "/Saves")) 
+            Directory.CreateDirectory(Application.persistentDataPath + "/Saves");
 
         BinaryFormatter formatter = new BinaryFormatter();
         string filename = contact.GetHashCode().ToString();//contact.name;//contact.GetHashCode().ToString();
-        FileStream saveFile = File.Create("Saves/" + filename + ".cntct");
+        FileStream saveFile = File.Create(Application.persistentDataPath + "/Saves/" + filename + ".cntct");
         formatter.Serialize(saveFile, contact);
         saveFile.Close();
     }
 
     private void RemoveSaveFile(string contactName)
     {
-        if (!Directory.Exists("Saves"))
+        if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
         {
-            Debug.Log("Nothing to load");
             contacts = new List<Contact>();
             return;
         }
 
-        string[] allsaves = System.IO.Directory.GetFiles(@"Saves", "*.cntct"); // my own extentions
+        string[] allsaves = System.IO.Directory.GetFiles(Application.persistentDataPath + "/Saves", "*.cntct"); // my own extentions
         if (allsaves.Length > 0)
         {
             FileStream saveFile;
@@ -150,12 +150,14 @@ public class GameData : ScriptableObject
                 }
             }
         }
+
+        Debug.Log("Couldnt Find Contact, Nothing Deleted");
     }
 
     //Only needed to load at start, all contacts are stored under contacts list
     public void LoadData()
     {
-        if (!Directory.Exists("Saves"))
+        if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
         {
             Debug.Log("Nothing to load");
             contacts = new List<Contact>();
@@ -165,7 +167,7 @@ public class GameData : ScriptableObject
         if (contacts == null) contacts = new List<Contact>();
         else contacts.Clear();
         
-        string[] allsaves = System.IO.Directory.GetFiles(@"Saves","*.cntct"); // my own extentions
+        string[] allsaves = System.IO.Directory.GetFiles((Application.persistentDataPath + "/Saves"), "*.cntct"); // my own extentions
         
         if (allsaves.Length > 0)
         {
@@ -214,6 +216,11 @@ public class GameData : ScriptableObject
         }
     }
 
+    public void EditContact(Contact editedContact)
+    {
+        RemoveContact(editedContact);
+        AddContact(editedContact);
+    }
     public bool RemoveContact(Contact contact)
     {
         Contact foundContact = contacts.Find(c => c.name == contact.name);

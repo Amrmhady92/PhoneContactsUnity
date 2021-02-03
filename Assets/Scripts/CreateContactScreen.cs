@@ -1,18 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
+using TMPro;
 
 public class CreateContactScreen : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private TextMeshProUGUI nameText;
+
+    [SerializeField] private GameObject addDetailWindow;
+
+
+
+    public void OnDropDownListSelect(int index)
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+
 }
