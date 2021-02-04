@@ -35,7 +35,7 @@ public class UIMover : MonoBehaviour
         if (setSpeed >= 0) spd = setSpeed;
 
         offPos = rectTransform.position;
-        offPos.y = Display.displays[0].renderingHeight + rectTransform.sizeDelta.y;
+        offPos.y = Display.displays[0].renderingHeight * 2 + rectTransform.sizeDelta.y;
         if (offIsDown) offPos.y *= -1;
 
         rectTransform.LeanCancel();
@@ -66,7 +66,7 @@ public class UIMover : MonoBehaviour
         if (hidden)
         {
             offPos = startPos;
-            offPos.y = Display.displays[0].renderingHeight + rectTransform.sizeDelta.y;
+            offPos.y = Display.displays[0].renderingHeight * 2 + rectTransform.sizeDelta.y;
             if (offIsDown) offPos.y *= -1;
             rectTransform.LeanCancel();
             rectTransform.LeanMove(offPos, 0);
