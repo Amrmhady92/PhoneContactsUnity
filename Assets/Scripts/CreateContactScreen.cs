@@ -254,7 +254,7 @@ public class CreateContactScreen : MonoBehaviour
     }
     public void OnFinishedEditButtonPressed()
     {
-        if(contact.name+contact.lastname == "")
+        if (contact.name + contact.lastname == "")
         {
             EnableDisableButtons(false); // just to make sure
             warningWindowText.text = "Contact Has No Name";
@@ -275,6 +275,7 @@ public class CreateContactScreen : MonoBehaviour
         }
         if(contact != null && contact.name != "")
         {
+            contact.dateAdded = System.DateTime.Now;
             Handler.Instance.PhoneData.AddContact(contact);
         }
         EnableDisableButtons(true);
