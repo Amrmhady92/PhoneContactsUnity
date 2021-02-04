@@ -61,5 +61,11 @@ UI Art is not implemented, also due to limited time.
 
 ============================================================================
 
+Time Spent: 21.83 hrs + 3 hrs (buffer)
+
+            24.83 hrs
+
+============================================================================
+
 Feel Free to contact me about any detail in the project.
 Thanks for Reading.

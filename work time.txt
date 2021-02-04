@@ -4,4 +4,8 @@ Feb 01: 11.00 am - 03.21 pm  4.35
 Feb 03: 10.25 am - 12.01 am  1.60
 	01.20 pm - 04.12 pm  2.86
 	09.12 pm - 11.49 pm  2.61
-Feb 04: 12.45 am - 03.53 am  3.63
+Feb 04: 12.45 am - 05.53 am  5.63
+
+Time Spent: 21.83 hrs + 3 hrs (buffer)
+
+            24.83 hrs
