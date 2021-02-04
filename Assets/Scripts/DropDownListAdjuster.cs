@@ -24,7 +24,6 @@ public class DropDownListAdjuster : MonoBehaviour
         size.y = yToHeightPercent * UIScreenListener.Height;
         rectTransform.sizeDelta = size;
 
-        //dropDown.template.sizeDelta;
         size.x = dropDown.template.sizeDelta.x;
         size.y *= dropDown.options.Count;
         dropDown.template.sizeDelta = size;

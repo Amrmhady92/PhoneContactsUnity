@@ -10,12 +10,6 @@ public class GameData : ScriptableObject
 
     [SerializeField] private List<Contact> contacts;
 
-    //private ContactsSaver saver;
-    private FileInfo dataFile;
-    //private string directory;
-
-
-
 
     //My initial Save Load using JSON, can test later to see which is faster
     private void Save()
@@ -63,41 +57,14 @@ public class GameData : ScriptableObject
         //contacts = new List<Contact>(saver.contacts);
     }
 
-    //SaveData() & LoadData() Code used from 
+    //SaveData() & LoadData() Code used from , edited to fit the project
     //https://www.sitepoint.com/saving-and-loading-player-game-data-in-unity/
 
-    //To do -- save each contact in a file
-    //public void SaveData()
-    //{
-
-    //    //if (saver == null)
-    //    //{
-    //    //    saver = new ContactsSaver();
-    //    //}
-    //    //saver.contacts = contacts;
-    //    if (contacts == null || contacts.Count == 0) return;
-
-
-
-    //    if (!Directory.Exists("Saves"))
-    //        Directory.CreateDirectory("Saves");
-
-    //    BinaryFormatter formatter = new BinaryFormatter();
-    //    string filename = "";
-    //    //FileStream saveFile = File.Create("Saves/save.binary");
-    //    FileStream saveFile = File.Create("Saves/"+ filename + ".cntct");
-    //    Debug.Log("saving");
-
-
-    //    formatter.Serialize(saveFile, saver);
-
-    //    saveFile.Close();
-    //}
+    
 
     //Must be called
     public void Init()
     {
-        //saver = new ContactsSaver();
         LoadData();
     }
     private void SaveContact(Contact contact)
@@ -111,7 +78,7 @@ public class GameData : ScriptableObject
             Directory.CreateDirectory(Application.persistentDataPath + "/Saves");
 
         BinaryFormatter formatter = new BinaryFormatter();
-        string filename = contact.GetHashCode().ToString();//contact.name;//contact.GetHashCode().ToString();
+        string filename = contact.GetHashCode().ToString();
         FileStream saveFile = File.Create(Application.persistentDataPath + "/Saves/" + filename + ".cntct");
         formatter.Serialize(saveFile, contact);
         saveFile.Close();
@@ -184,26 +151,18 @@ public class GameData : ScriptableObject
 
                 if(contact != null)
                 {
-                    //Debug.Log("Loaded Contact: " + contact.name);
                     contacts.Add(contact);
                 }
             }
         }
-        //if (saver != null) contacts = saver.contacts;
-        //else contacts = new List<Contact>();
 
-        //FileStream saveFile = File.Open("Saves/save.binary", FileMode.Open);
 
     }
 
     public string AddContact(Contact contact)
     {
-        //if (!initialized) Init();
-
         if (contact == null) return "Contact is Null";
 
-        //Contact foundContact = contacts.Find(c => c.name.ToLower() + c.lastname.ToLower() == contact.name.ToLower() + contact.lastname.ToLower());
-        //if (foundContact != null)
         if (FindExactContact(contact) != null)
         {
             Debug.LogError("Contact already exist");
@@ -267,7 +226,6 @@ public class GameData : ScriptableObject
     List<string> tempEmailsAndLinks = new List<string>();
     int searchedStringLength;
     string searchedString;
-    //string splitString;
     bool found = false;
     int index;
     Contact tempContact;
@@ -292,18 +250,15 @@ public class GameData : ScriptableObject
             {
                 if (tempContact.name.Length > searchedStringLength)
                 {
-                    //splitString = tempContact.name.Substring(0, searchedStringLength);
                     index = tempContact.name.ToLower().IndexOf(enteredText);
                 }
                 else
                 {
                     index = enteredText.IndexOf(tempContact.name.ToLower());
-                    //splitString = tempContact.name;
                 }
-                //Debug.Log("index for contact name " + tempContact.name + " : " + index);
 
                 //If name matches
-                if (index >= 0/*splitString == enteredText*/)
+                if (index >= 0)
                 {
                     tempContacts.Add(tempContact);
                     continue;
@@ -317,18 +272,14 @@ public class GameData : ScriptableObject
             {
                 if (tempContact.lastname.Length > searchedStringLength)
                 {
-                    //splitString = tempContact.name.Substring(0, searchedStringLength);
                     index = tempContact.lastname.ToLower().IndexOf(enteredText);
                 }
                 else
                 {
                     index = enteredText.IndexOf(tempContact.lastname.ToLower());
-                    //splitString = tempContact.name;
                 }
-                //Debug.Log("index for contact name " + tempContact.name + " : " + index);
-
                 //If name matches
-                if (index >= 0/*splitString == enteredText*/)
+                if (index >= 0)
                 {
                     tempContacts.Add(tempContact);
                     continue;
@@ -360,12 +311,10 @@ public class GameData : ScriptableObject
                 searchedString = tempContact.phoneNumbers[j].number.ToLower();
                 if (searchedString.Length > searchedStringLength)
                 {
-                    //splitString = searchedString.Substring(0, searchedStringLength);
                     index = searchedString.IndexOf(enteredText);
                 }
                 else
                 {
-                    //splitString = searchedString;
                     index = enteredText.IndexOf(searchedString);
                 }
 
@@ -394,12 +343,10 @@ public class GameData : ScriptableObject
                 searchedString = tempEmailsAndLinks[j].ToLower();
                 if (searchedString.Length > searchedStringLength)
                 {
-                    //splitString = searchedString.Substring(0, searchedStringLength);
                     index = searchedString.IndexOf(enteredText);
                 }
                 else
                 {
-                    //splitString = searchedString;
                     index = enteredText.IndexOf(searchedString);
                 }
 
@@ -419,8 +366,3 @@ public class GameData : ScriptableObject
 
 }
 
-//[System.Serializable]
-//public class ContactsSaver
-//{
-//    public List<Contact> contacts;
-//}

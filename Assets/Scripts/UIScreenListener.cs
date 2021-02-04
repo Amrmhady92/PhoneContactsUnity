@@ -76,7 +76,6 @@ public class UIScreenListener : MonoBehaviour
     {
         scaler = GameObject.FindObjectOfType<CanvasScaler>();
         ScreenOrientation = Screen.orientation;
-        Debug.Log(screenOrientation);
 
     }
     private void Update()
@@ -92,27 +91,17 @@ public class UIScreenListener : MonoBehaviour
             change = true;
         }
 
-        if (screenOrientation != Screen.orientation)
-        {
-            ScreenOrientation = Screen.orientation;
-            Debug.Log("Change");
-        }
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    if(screenOrientation == ScreenOrientation.Portrait)
-        //    {
-        //        ScreenOrientation = ScreenOrientation.Landscape;
-        //    }
-        //    else
-        //    {
-        //        ScreenOrientation = ScreenOrientation.Portrait;
-        //    }
-        //}
-
         if (change)
         {
             change = false;
             OnScreenSizeChange?.Invoke();
         }
+
+        if (screenOrientation != Screen.orientation)
+        {
+            ScreenOrientation = Screen.orientation;
+        }
+
+
     }
 }

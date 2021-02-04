@@ -9,7 +9,8 @@ A version of the APK is also available in the repo to install directly without t
 Instructions for use:
 The App should be clear on how to use.
 However, the following should explain:
--Adding a contact:
+
+#Adding a contact:
 	To Add a contact, press on the [+] button on the top right of the screen, then you will be presented with the create Contact screen. pressing on the [+] button on the top right of the screen will give you the option to Add a detail to the contact. Details include Name (First and Last), Phone, Email, Links and Description.
 Each detail can be added by pressing the [+] button then selecting the type of detail from the drop down list.
 A new window will appear according to the selected detail type. Enter the desired values in the corresponding parameters, ie. input fields.
@@ -23,7 +24,7 @@ In the Contact Creation screen, you can delete entered details by pressing on th
 The contacts are saved under "\Android\data\com.JuxtapoZition.PhoneBookUnity\files\Saves", save files are not named after the contacts, save files have the extention ".cntct"
 	
 -Viewing Contacts:
-	After creating contacts, you can preview available contacts by pressing on their names in teh Main screen, you will then be moved to the View Contact screen, pressing on the Phone numbers, Emails or links should start a call or go to the link provided.
+	After creating contacts, you can preview available contacts by pressing on their names in the Main screen, you will then be moved to the View Contact screen, pressing on the Phone numbers, Emails or links should start a call or go to the link provided.
 
 pressing the [Edit] button will send you to the Contact Creation screen with the filled contact details, so you can add or remove details from it.
 
@@ -41,7 +42,7 @@ Input given to search bar will search for everything a contact may have, Name, P
 Leaving the Create Contact Screen is only doable throught the [Finish] or [Cancel] buttons.
 
 
-================================================================================================================
+============================================================================
 
 Implementiation and Shortcomings:
 Contacts are saved using the BinaryFormatter by serialization of the Class (Contact), and saved in the .cntct format, the naming is the HashCode of the class.
@@ -54,9 +55,11 @@ Problems with UI when switching to Landscape mode, buttons change in sizes, howe
 
 Class UIMover is used to play animation for Panels.
 
-Handler Class is used mainly for the Main screen, with some association with the other screens. (not optimal but due to time and deadline)
+Handler Class is used mainly for the Main screen, with some association with the other screens. (not optimal but due to time and deadline).
 
-================================================================================================================
+UI Art is not implemented, also due to limited time.
+
+============================================================================
 
 Feel Free to contact me about any detail in the project.
 Thanks for Reading.
