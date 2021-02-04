@@ -117,7 +117,7 @@ public class GameData : ScriptableObject
         saveFile.Close();
     }
 
-    private void RemoveSaveFile(string contactName)
+    private void RemoveSaveFile(Contact contactToDelete)
     {
         if (!Directory.Exists(Application.persistentDataPath + "/Saves"))
         {
@@ -141,10 +141,10 @@ public class GameData : ScriptableObject
 
                 if (contact != null)
                 {
-                    if(contact.name.ToLower() == contactName.ToLower())
+                    if(contact.CompareContact(contactToDelete))
                     {
                         File.Delete(allsaves[i]);
-                        Debug.Log("Found and Deleted " + contactName);
+                        Debug.Log("Found and Deleted " + contactToDelete.name);
                         return;
                     }
                 }
@@ -202,8 +202,9 @@ public class GameData : ScriptableObject
 
         if (contact == null) return "Contact is Null";
 
-        Contact foundContact = contacts.Find(c => c.name.ToLower() == contact.name.ToLower());
-        if (foundContact != null)
+        //Contact foundContact = contacts.Find(c => c.name.ToLower() + c.lastname.ToLower() == contact.name.ToLower() + contact.lastname.ToLower());
+        //if (foundContact != null)
+        if (FindExactContact(contact) != null)
         {
             Debug.LogError("Contact already exist");
             return "Contact already exist";
@@ -223,13 +224,26 @@ public class GameData : ScriptableObject
     }
     public bool RemoveContact(Contact contact)
     {
-        Contact foundContact = contacts.Find(c => c.name == contact.name);
-        if(foundContact != null)
+        //Contact foundContact = contacts.Find(c => c.name + c.lastname == contact.name + contact.lastname);
+        //Testing, might be slower
+        Contact found = FindExactContact(contact);
+        if (found != null)
         {
-            contacts.Remove(foundContact);
-            //SaveData();
-            RemoveSaveFile(contact.name);
+            //if (foundContact.CompareContact(contact))
+            //{
+            Debug.Log("Found");
+            if (contacts.Remove(found))// remove from list
+            {
+                Debug.Log("Removed from List");
+            }
+            RemoveSaveFile(contact); //Delete the save file
             return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
+
         }
         else
         {
@@ -237,6 +251,12 @@ public class GameData : ScriptableObject
             return false;
         }
     }
+
+    public Contact FindExactContact(Contact contact)
+    {
+        return contacts.Find(c => c.CompareContact(contact) == true);
+    }
+
     public List<Contact> GetAllContacts()
     {
         return contacts;
@@ -267,6 +287,7 @@ public class GameData : ScriptableObject
 
             found = false;
 
+            //First Name
             if (tempContact.name.Length > searchedStringLength)
             {
                 //splitString = tempContact.name.Substring(0, searchedStringLength);
@@ -285,6 +306,28 @@ public class GameData : ScriptableObject
                 tempContacts.Add(tempContact);
                 continue;
             }
+
+
+            //Last Name
+            if (tempContact.lastname.Length > searchedStringLength)
+            {
+                //splitString = tempContact.name.Substring(0, searchedStringLength);
+                index = tempContact.lastname.ToLower().IndexOf(enteredText);
+            }
+            else
+            {
+                index = enteredText.IndexOf(tempContact.lastname.ToLower());
+                //splitString = tempContact.name;
+            }
+            //Debug.Log("index for contact name " + tempContact.name + " : " + index);
+
+            //If name matches
+            if (index >= 0/*splitString == enteredText*/)
+            {
+                tempContacts.Add(tempContact);
+                continue;
+            }
+
 
             //else Check Notes (less work than next items)
             if (tempContact.description.Length > searchedStringLength)

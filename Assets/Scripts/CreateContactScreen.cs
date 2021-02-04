@@ -16,13 +16,20 @@ public class CreateContactScreen : MonoBehaviour
     [SerializeField] private UIMover addLinkWindow;
     [SerializeField] private UIMover addDescriptionWindow;
 
+    [SerializeField] private UIMover confirmDeleteWindow;
+    [SerializeField] private UIMover warningWindow;
+    [SerializeField] private TextMeshProUGUI warningWindowText;
+
     [SerializeField] private Pooler contactDetailPool;
+    [SerializeField] private GameObject addContactDetailButtonGO;
+    [SerializeField] private GameObject finishButtonGO;
+    [SerializeField] private GameObject cancelButtonGO;
 
     private List<GameObject> activeObjects;
     private ContactDetail cDetail = null;
     private GameObject detailObject = null;
     private Contact contact;
-    private string oldContactName = "";
+    private Contact oldContact;
     private UIMover lastMover = null;
     private string insertedData_1;
     private string insertedData_2;
@@ -57,19 +64,41 @@ public class CreateContactScreen : MonoBehaviour
     }
 
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if(lastMover != null)
+            {
+                lastMover.HideObject();
+            }
+            EnableDisableButtons(true);
+            UpdateScreen();
+        }
+    }
+
     public bool CreateContactWindow(Contact c = null)
     {
-        if (c == null) contact = new Contact();
+        if (c == null)
+        {
+            contact = new Contact();
+            oldContact = null;
+        }
         else
         {
-            oldContactName = c.name;
+            oldContact = new Contact(c);
             contact = new Contact(c);
         }
+
+        insertedData_1 = "";
+        insertedData_2 = "";
         return UpdateScreen();
     }
 
     private bool UpdateScreen()
     {
+        if (contact == null) return false;
+
         if (activeObjects == null)
         {
             activeObjects = new List<GameObject>();
@@ -84,15 +113,13 @@ public class CreateContactScreen : MonoBehaviour
         }
 
         //Name
-        if (contact.name != "")
-        {
-            nameText.text = contact.name + " " + contact.lastname;
-        }
+
+         nameText.text ="Name: " + contact.name + " " + contact.lastname;
+        
 
         //Phones
         for (int i = 0; i < contact.phoneNumbers.Count; i++)
         {
-            Debug.Log(contact.phoneNumbers.Count);
             if (MakeContact(DetailType.Phone, i) == false)
             {
                 Debug.LogError("Failed to Create Detail");
@@ -136,7 +163,6 @@ public class CreateContactScreen : MonoBehaviour
     {
         selectedType = (DetailType)index;
     }
-
     public void OnDropDownListPhoneSelect(int index)
     {
         insertedPhoneNumberType = (PhoneNumberType)index;
@@ -167,48 +193,95 @@ public class CreateContactScreen : MonoBehaviour
                 break;
         }
     }
-
     public void OnConfirmAddedDetail()
     {
         switch (selectedType)
         {
             case DetailType.Name:
                 nameText.text = "Name: " + insertedData_1 + " " + insertedData_2;
-                contact.name = insertedData_1;
-                contact.lastname = insertedData_2;
+                contact.name = insertedData_1 == "" ? contact.name : insertedData_1;
+                contact.lastname = insertedData_2 == "" ? contact.lastname : insertedData_2;
                 break;
             case DetailType.Phone:
                 PhoneNumber pNum = new PhoneNumber();
                 pNum.type = insertedPhoneNumberType;
                 pNum.number = insertedData_1;
-                contact.phoneNumbers.Add(pNum);
-                MakeContact(DetailType.Phone, contact.phoneNumbers.Count - 1);
+                if(contact.phoneNumbers.Contains(pNum) == false)
+                {
+                    contact.phoneNumbers.Add(pNum);
+                    MakeContact(DetailType.Phone, contact.phoneNumbers.Count - 1);
+                }
                 break;
             case DetailType.Email:
-                contact.emails.Add(insertedData_1);
-                MakeContact(DetailType.Email, contact.emails.Count);
+                if (contact.emails.Contains(insertedData_1) == false)
+                {
+                    contact.emails.Add(insertedData_1);
+                    MakeContact(DetailType.Email, contact.emails.Count - 1);
+                }
                 break;
             case DetailType.Link:
-                contact.links.Add(insertedData_1);
-                MakeContact(DetailType.Link, contact.links.Count);
+                if(contact.links.Contains(insertedData_1) == false)
+                {
+                    contact.links.Add(insertedData_1);
+                    MakeContact(DetailType.Link, contact.links.Count - 1);
+                }
                 break;
             case DetailType.Description:
-                contact.description = insertedData_1;
-                MakeContact(DetailType.Description);
+
+                if (contact.description != insertedData_1) 
+                {
+                    contact.description = insertedData_1;
+                }
+                if(contact.description != "")
+                {
+                    MakeContact(DetailType.Description);
+                }
                 break;
         }
         if (lastMover != null) lastMover.HideObject();
         UpdateScreen();
+        finishButtonGO.SetActive(true);
     }
     public void OnCancelButtonPressed()
     {
-
+        contact = null;
+        Handler.Instance.CurrentState = ScreenState.MainMenu;
+        EnableDisableButtons(true);
+    }
+    public void EnableDisableButtons(bool onOff)
+    {
+        finishButtonGO.SetActive(onOff);
+        addContactDetailButtonGO.SetActive(onOff);
+        cancelButtonGO.SetActive(onOff);
     }
     public void OnFinishedEditButtonPressed()
     {
+        if(contact.name+contact.lastname == "")
+        {
+            EnableDisableButtons(false); // just to make sure
+            warningWindowText.text = "Contact Has No Name";
+            warningWindow.UnHideObject();
+            return;
+        }
+        if (Handler.Instance.PhoneData.FindExactContact(contact) != null)
+        {
+            EnableDisableButtons(false); // just to make sure
+            warningWindowText.text = "Contact Already Exists";
+            warningWindow.UnHideObject();
+            return;
+        }
 
+        if (oldContact != null)
+        {
+            Handler.Instance.PhoneData.RemoveContact(oldContact);
+        }
+        if(contact != null && contact.name != "")
+        {
+            Handler.Instance.PhoneData.AddContact(contact);
+        }
+        EnableDisableButtons(true);
+        Handler.Instance.CurrentState = ScreenState.MainMenu;
     }
-
     private bool MakeContact(DetailType type, int index = 0)
     {
         detailObject = contactDetailPool.Get(true);
@@ -219,6 +292,7 @@ public class CreateContactScreen : MonoBehaviour
         }
         activeObjects.Add(detailObject);
         cDetail = detailObject.GetComponent<ContactDetail>();
+        cDetail.onButtonClick = SetDetailDelete; //cheap trick for now
         if (cDetail != null)
         {
             if (cDetail.SetContactDetail(contact, type, index) == false)
@@ -233,5 +307,63 @@ public class CreateContactScreen : MonoBehaviour
         }
 
         return true;
+    }
+    private void DeleteDetail(ContactDetail detail)
+    {
+        Debug.Log("Delete");
+        switch (detail.Type)
+        {
+            case DetailType.Phone:
+                PhoneNumberType type;
+                for (int i = 0; i < contact.phoneNumbers.Count; i++)
+                {
+                    //Temp solution for the detail
+                    if (detail.DetailTypeText.text.Contains("Mobile")) type = PhoneNumberType.Mobile;
+                    else if (detail.DetailTypeText.text.Contains("Home")) type = PhoneNumberType.Home;
+                    else type = PhoneNumberType.Work;
+                    if (contact.phoneNumbers[i].number == detail.DetailValueText.text && contact.phoneNumbers[i].type == type)
+                    {
+                        contact.phoneNumbers.RemoveAt(i);
+                        break;
+                    }
+                }
+                break;
+            case DetailType.Email:
+                for (int i = 0; i < contact.emails.Count; i++)
+                {
+                    if (contact.emails[i] == detail.DetailValueText.text)
+                    {
+                        contact.emails.RemoveAt(i);
+                        break;
+                    }
+                }
+                break;
+            case DetailType.Link:
+                for (int i = 0; i < contact.links.Count; i++)
+                {
+                    if (contact.links[i] == detail.DetailValueText.text)
+                    {
+                        contact.links.RemoveAt(i);
+                        break;
+                    }
+                }
+                break;
+            case DetailType.Description:
+                contact.description = "";
+                break;
+        }
+        UpdateScreen();
+    }
+    private void SetDetailDelete(ContactDetail detail)
+    {
+        cDetail = detail;
+        confirmDeleteWindow.UnHideObject();
+        EnableDisableButtons(false);
+    }
+    public void ConfirmDeleteButtonPressed()
+    {
+        EnableDisableButtons(true);
+        DeleteDetail(cDetail);
+        cDetail = null;
     }
 }

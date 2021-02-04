@@ -41,6 +41,44 @@ public class Contact
         this.description = "";
         this.dateAdded = DateTime.Today;
     }
+
+    public bool CompareContact(Contact c)
+    {
+        if (c == null) return false;
+        if (name + lastname != c.name + c.lastname) return false;
+        if (description != c.description) return false;
+
+
+        if (phoneNumbers.Count == c.phoneNumbers.Count)
+        {
+            for (int i = 0; i < c.phoneNumbers.Count; i++)
+            {
+                if (c.phoneNumbers[i].type != phoneNumbers[i].type) return false;
+                if (c.phoneNumbers[i].number != phoneNumbers[i].number) return false;
+            }
+        }
+        else return false;
+
+        if (emails.Count == c.emails.Count)
+        {
+            for (int i = 0; i < c.emails.Count; i++)
+            {
+                if (c.emails[i] != emails[i]) return false;
+            }
+        }
+        else return false;
+
+        if (links.Count == c.links.Count)
+        {
+            for (int i = 0; i < c.links.Count; i++)
+            {
+                if (c.links[i] != links[i]) return false;
+            }
+        }
+        else return false;
+
+        return true;
+    }
 }
 
 [System.Serializable]

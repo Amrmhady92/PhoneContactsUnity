@@ -7,11 +7,14 @@ public class ContactScreen : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI contactNameText;
     [SerializeField] private Pooler contactDetailsPool;
+    [SerializeField] private UIMover confirmDeleteWindow;
+    [SerializeField] private GameObject[] screenButtons;
 
     private List<GameObject> activeObjects;
     private ContactDetail cDetail = null;
     private GameObject detailObject = null;
     private Contact contact;
+
     public bool DisplayContact(Contact contact)
     {
         if(contactDetailsPool == null)
@@ -71,12 +74,15 @@ public class ContactScreen : MonoBehaviour
         }
 
         //Description
-        if (MakeContact(DetailType.Description) == false)
+        if(contact.description != "")
         {
-            Debug.LogError("Failed to Create Detail");
-            return false;
+            if (MakeContact(DetailType.Description) == false)
+            {
+                Debug.LogError("Failed to Create Detail");
+                return false;
+            }
         }
-
+        
         //Date Added
         if (MakeContact(DetailType.DateAdded) == false)
         {
@@ -116,15 +122,39 @@ public class ContactScreen : MonoBehaviour
 
     public void OnDeleteContactButtonPressed()
     {
-        
+        confirmDeleteWindow.UnHideObject();
+        EnableDiableButtons(false);
+
+    }
+
+    public void OnDeleteConfirm()
+    {
+        Handler.Instance.PhoneData.RemoveContact(contact);
+        Handler.Instance.CurrentState = ScreenState.MainMenu;
+        confirmDeleteWindow.HideObject();
+        EnableDiableButtons(true);
+    }
+
+    public void OnDeleteCancel()
+    {
+        confirmDeleteWindow.HideObject();
+        EnableDiableButtons(true);
     }
 
     public void OnEditContactButtonPressed()
     {
         Handler.Instance.CurrentState = ScreenState.ContactCreationScreen;
-        if (Handler.Instance.CreateContactScreen.CreateContactWindow(contact) == false)
+        if (Handler.Instance.CreateContactScreenComponent.CreateContactWindow(contact) == false)
         {
             Handler.Instance.CurrentState = ScreenState.MainMenu;
+        }
+    }
+
+    private void EnableDiableButtons(bool onOff)
+    {
+        for (int i = 0; i < screenButtons.Length; i++)
+        {
+            screenButtons[i].SetActive(onOff);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine;
 using TMPro;
 
@@ -17,9 +18,49 @@ public class ContactDetail : MonoBehaviour
     [SerializeField] private TextMeshProUGUI detailTypeText;
     [SerializeField] private TextMeshProUGUI detailValueText;
     [SerializeField] private DetailType type;
+    public UnityAction<ContactDetail> onButtonClick;
+
+    public DetailType Type
+    {
+        get
+        {
+            return type;
+        }
+
+        private set
+        {
+            type = value;
+        }
+    }
+
+    public TextMeshProUGUI DetailValueText
+    {
+        get
+        {
+            return detailValueText;
+        }
+
+        private set
+        {
+            detailValueText = value;
+        }
+    }
+    public TextMeshProUGUI DetailTypeText
+    {
+        get
+        {
+            return detailTypeText;
+        }
+
+        private set
+        {
+            detailTypeText = value;
+        }
+    }
+
     public bool SetContactDetail(Contact contact, DetailType detailType, int index = 0)
     {
-        type = detailType;
+        Type = detailType;
         string num = "";
         switch (detailType)
         {
@@ -28,7 +69,7 @@ public class ContactDetail : MonoBehaviour
                 detailValueText.text = contact.name + " " + contact.lastname;
                 break;
             case DetailType.Phone:
-                if (index > contact.phoneNumbers.Count && index < 0) return false;
+                if (index >= contact.phoneNumbers.Count && index < 0) return false;
                 num = "";
                 //If there are more mobile/home etc. put the number of it next to "Mobile : " etc.
                 if (contact.phoneNumbers.Count > 1)
@@ -54,9 +95,8 @@ public class ContactDetail : MonoBehaviour
                 detailValueText.text = contact.phoneNumbers[index].number;
                 return true;
             case DetailType.Email:
-                if (index > contact.emails.Count && index < 0) return false;
+                if (index >= contact.emails.Count && index < 0) return false;
                  num = "";
-                //If there are more mobile/home etc. put the number of it next to "Mobile : " etc.
                 if (contact.emails.Count > 1)
                 {
                     int ind = 0;
@@ -77,9 +117,8 @@ public class ContactDetail : MonoBehaviour
                 detailValueText.text = contact.emails[index];
                 return true;
             case DetailType.Link:
-                if (index > contact.links.Count && index < 0) return false;
+                if (index >= contact.links.Count && index < 0) return false;
                 num = "";
-                //If there are more mobile/home etc. put the number of it next to "Mobile : " etc.
                 if (contact.links.Count > 1)
                 {
                     int ind = 0;
@@ -115,7 +154,7 @@ public class ContactDetail : MonoBehaviour
 
     public void OnContactDetailClicked()
     {
-        switch (type)
+        switch (Type)
         {
             case DetailType.Phone:
                 //Code taken from online 
@@ -152,5 +191,9 @@ public class ContactDetail : MonoBehaviour
                 //Do Nothing
                 break;
         }
+    }
+    public void InvokeSelf()
+    {
+        onButtonClick?.Invoke(this);
     }
 }

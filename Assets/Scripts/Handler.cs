@@ -43,8 +43,6 @@ public class Handler : MonoBehaviour
     [SerializeField] private CreateContactScreen createContactScreen;
 
 
-    [SerializeField] private Canvas gameCanvas;
-    
 
     private ScreenState currentState = ScreenState.MainMenu;
 
@@ -58,8 +56,6 @@ public class Handler : MonoBehaviour
 
     private List<Contact> contacts;
     private List<GameObject> activeContactHolders;
-
-    private CanvasScaler gameCanvasScaler;
 
     private static Handler instance;
     public static Handler Instance
@@ -104,6 +100,9 @@ public class Handler : MonoBehaviour
                         UnHideMovers(mainMenuMovers);
                     }
                     ));
+                    contactScreen.OnDeleteCancel();
+                    LoadContacts();
+                    SortContacts(currentSortMethod);
                     break;
                 case ScreenState.ContactDetailScreen:
 
@@ -128,7 +127,7 @@ public class Handler : MonoBehaviour
         }
     }
 
-    public CreateContactScreen CreateContactScreen
+    public CreateContactScreen CreateContactScreenComponent
     {
         get
         {
@@ -167,10 +166,6 @@ public class Handler : MonoBehaviour
         if (instance == null) instance = this;
 
         contacts = new List<Contact>();
-        gameCanvasScaler = gameCanvas.GetComponent<CanvasScaler>();
-
-
-
     }
 
     private void Start()
@@ -245,7 +240,7 @@ public class Handler : MonoBehaviour
 
     private void Update()
     {
-        if ((Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape)) && CurrentState == ScreenState.ContactDetailScreen)
+        if (Input.GetKeyDown(KeyCode.Escape) && CurrentState == ScreenState.ContactDetailScreen)
         {
             CurrentState = ScreenState.MainMenu;
         }
@@ -287,7 +282,7 @@ public class Handler : MonoBehaviour
     #endregion
 
     #region UI Methods;
-    private bool ClickCoolDown()
+    public bool ClickCoolDown()
     {
         if (canClick)
         {
@@ -407,10 +402,10 @@ public class Handler : MonoBehaviour
         if (ClickCoolDown() == false) return;
         if (searching) OnSearchButtonPressed();
         CurrentState = ScreenState.ContactCreationScreen;
-
+        CreateContactScreenComponent.CreateContactWindow();
         //createContactScreen.
 
-        
+
     }
 
     public void OnSearchButtonPressed()
@@ -432,8 +427,6 @@ public class Handler : MonoBehaviour
         {
             searching = true;
             searchBar.LeanCancel();
-            Debug.Log(/*Screen.currentResolution.height*/gameCanvasScaler.referenceResolution.x);
-
             //Vector2 offSize = new Vector2(gameCanvasScaler.referenceResolution.x * 0.7f, searchBar.sizeDelta.y); // 70% of screen width.
             //searchBar.LeanSize(offSize, 0.2f);
             searchBar.LeanScaleX(1, 0.2f);

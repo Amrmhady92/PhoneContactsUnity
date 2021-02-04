@@ -28,6 +28,7 @@ public class UIMover : MonoBehaviour
 
     public void HideObject(float setSpeed = -1)
     {
+        if (hidden) return; 
         if(rectTransform == null) rectTransform = this.GetComponent<RectTransform>();
 
         float spd = speed;
@@ -45,13 +46,15 @@ public class UIMover : MonoBehaviour
     
     public void UnHideObject(float setSpeed = -1)
     {
+        if (!hidden) return;
         if (rectTransform == null) rectTransform = this.GetComponent<RectTransform>();
 
         float spd = speed;
         if (setSpeed >= 0) spd = setSpeed;
+
         Vector3 tar = startPos;
         tar.y = Display.displays[0].renderingHeight * startPosPerc;
-        //this.gameObject.SetActive(true);
+
         rectTransform.LeanCancel();
         rectTransform.LeanMove(tar, spd);
         hidden = false;
