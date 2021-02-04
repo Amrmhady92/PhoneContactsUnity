@@ -79,12 +79,13 @@ public class CreateContactScreen : MonoBehaviour
 
     public bool CreateContactWindow(Contact c = null)
     {
+        //Editing a Contact
         if (c == null)
         {
             contact = new Contact();
             oldContact = null;
         }
-        else
+        else // for new Contact
         {
             oldContact = new Contact(c);
             contact = new Contact(c);
