@@ -288,61 +288,71 @@ public class GameData : ScriptableObject
             found = false;
 
             //First Name
-            if (tempContact.name.Length > searchedStringLength)
+            if(tempContact.name != "")
             {
-                //splitString = tempContact.name.Substring(0, searchedStringLength);
-                index = tempContact.name.ToLower().IndexOf(enteredText);
-            }
-            else
-            {
-                index = enteredText.IndexOf(tempContact.name.ToLower());
-                //splitString = tempContact.name;
-            }
-            //Debug.Log("index for contact name " + tempContact.name + " : " + index);
+                if (tempContact.name.Length > searchedStringLength)
+                {
+                    //splitString = tempContact.name.Substring(0, searchedStringLength);
+                    index = tempContact.name.ToLower().IndexOf(enteredText);
+                }
+                else
+                {
+                    index = enteredText.IndexOf(tempContact.name.ToLower());
+                    //splitString = tempContact.name;
+                }
+                //Debug.Log("index for contact name " + tempContact.name + " : " + index);
 
-            //If name matches
-            if (index >= 0/*splitString == enteredText*/)
-            {
-                tempContacts.Add(tempContact);
-                continue;
+                //If name matches
+                if (index >= 0/*splitString == enteredText*/)
+                {
+                    tempContacts.Add(tempContact);
+                    continue;
+                }
             }
+            
 
 
             //Last Name
-            if (tempContact.lastname.Length > searchedStringLength)
+            if(tempContact.lastname != "")
             {
-                //splitString = tempContact.name.Substring(0, searchedStringLength);
-                index = tempContact.lastname.ToLower().IndexOf(enteredText);
-            }
-            else
-            {
-                index = enteredText.IndexOf(tempContact.lastname.ToLower());
-                //splitString = tempContact.name;
-            }
-            //Debug.Log("index for contact name " + tempContact.name + " : " + index);
+                if (tempContact.lastname.Length > searchedStringLength)
+                {
+                    //splitString = tempContact.name.Substring(0, searchedStringLength);
+                    index = tempContact.lastname.ToLower().IndexOf(enteredText);
+                }
+                else
+                {
+                    index = enteredText.IndexOf(tempContact.lastname.ToLower());
+                    //splitString = tempContact.name;
+                }
+                //Debug.Log("index for contact name " + tempContact.name + " : " + index);
 
-            //If name matches
-            if (index >= 0/*splitString == enteredText*/)
-            {
-                tempContacts.Add(tempContact);
-                continue;
+                //If name matches
+                if (index >= 0/*splitString == enteredText*/)
+                {
+                    tempContacts.Add(tempContact);
+                    continue;
+                }
             }
-
 
             //else Check Notes (less work than next items)
-            if (tempContact.description.Length > searchedStringLength)
+            if(tempContact.description != "")
             {
-                index = tempContact.description.ToLower().IndexOf(enteredText);
+                if (tempContact.description.Length > searchedStringLength)
+                {
+                    index = tempContact.description.ToLower().IndexOf(enteredText);
+                }
+                else
+                {
+                    index = enteredText.IndexOf(tempContact.description.ToLower());
+                }
+                if (index >= 0)
+                {
+                    tempContacts.Add(tempContact);
+                    continue;
+                }
             }
-            else
-            {
-                index = enteredText.IndexOf(tempContact.description.ToLower());
-            }
-            if (index >= 0)
-            {
-                tempContacts.Add(tempContact);
-                continue;
-            }
+            
 
             //else check Number 
             for (int j = 0; j < tempContact.phoneNumbers.Count; j++)
