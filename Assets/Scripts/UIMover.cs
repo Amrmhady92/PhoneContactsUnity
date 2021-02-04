@@ -39,7 +39,7 @@ public class UIMover : MonoBehaviour
         if (offIsDown) offPos.y *= -1;
 
         rectTransform.LeanCancel();
-        rectTransform.LeanMove(offPos, spd);//.setOnComplete(()=> { this.gameObject.SetActive(false); });
+        rectTransform.LeanMove(offPos, spd);
         hidden = true;
     }
 

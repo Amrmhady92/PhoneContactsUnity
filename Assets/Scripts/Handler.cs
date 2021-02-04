@@ -171,69 +171,6 @@ public class Handler : MonoBehaviour
     private void Start()
     {
         PhoneData.Init();
-
-        //CurrentState = ScreenState.MainMenu;
-        //for (int i = 0; i < contactViewScreenMovers.Length; i++)
-        //{
-        //    contactViewScreenMovers[i].gameObject.SetActive(false);
-        //}
-        //for (int i = 0; i < contactCreationScreenMovers.Length; i++)
-        //{
-        //    contactCreationScreenMovers[i].gameObject.SetActive(false);
-        //}
-        //HideMovers(contactViewScreenMovers, 0);
-        //HideMovers(contactCreationScreenMovers, 0);
-
-
-        //LoadContacts();
-
-        //PlayerPrefs.DeleteAll();
-        //if (PlayerPrefs.HasKey("FirstAdd1") == false) 
-        //{
-        //List<Contact> deleteContacts = new List<Contact>(contacts);
-
-        //for (int i = 0; i < deleteContacts.Count; i++)
-        //{
-        //    PhoneData.RemoveContact(deleteContacts[i]);
-        //}
-        //string[] names = new string[] { "Adam", "Kareem", "Hossam", "Nada", "Engy", "Mohamed", "Hala" };
-        //string[] namesL = new string[] { "Saleh", "Mohamed", "Abdelhady", "Mohamed", "Saleh", "Radwan", "ElSafy" };
-        //Contact c;
-        //for (int i = 0; i < names.Length; i++)
-        //{
-        //    c = new Contact();
-        //    c.name = names[i];
-        //    c.lastname = namesL[i];
-        //    c.phoneNumbers = new List<PhoneNumber>();
-        //    c.phoneNumbers.Add(new PhoneNumber() { number = Random.Range(10000000, 99999999).ToString(), type = PhoneNumberType.Mobile });
-        //    c.emails = new List<string>() { Random.Range(-1000, 1000).ToString() };
-        //    c.links = new List<string>() { Random.Range(-1000, 1000).ToString() };
-        //    c.description = Random.Range(-1000, 1000).ToString();
-        //    c.dateAdded = new System.DateTime(Random.Range(2000, 2020), Random.Range(1, 12), Random.Range(1, 30));
-        //    //Debug.Log(c.dateAdded);
-        //    phoneData.AddContact(c);
-
-        //}
-
-        //c = new Contact();
-        //c.name = "Amr";
-        //c.lastname = "Bond";
-        //c.phoneNumbers = new List<PhoneNumber>();
-        //c.phoneNumbers.Add(new PhoneNumber() { number = "0700446383", type = PhoneNumberType.Mobile });
-        //c.phoneNumbers.Add(new PhoneNumber() { number = "01145471546", type = PhoneNumberType.Mobile });
-        //c.phoneNumbers.Add(new PhoneNumber() { number = "7227703", type = PhoneNumberType.Home });
-        //c.phoneNumbers.Add(new PhoneNumber() { number = "7227694", type = PhoneNumberType.Home });
-        //c.phoneNumbers.Add(new PhoneNumber() { number = "8855222", type = PhoneNumberType.Work });
-        //c.emails = new List<string>() { Random.Range(-1000, 1000).ToString(), "Amrmhady92@gmail.com" };
-        //c.links = new List<string>() { Random.Range(-1000, 1000).ToString(), "L2", "LINKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK" };
-        //c.description = "This contact is used to test the contacts detail screen, bond james bond ";
-        //c.dateAdded = new System.DateTime(Random.Range(2000, 2020), Random.Range(1, 12), Random.Range(1, 30));
-        //Debug.Log(c.dateAdded);
-        //phoneData.AddContact(c);
-
-        //    PlayerPrefs.SetInt("First", 0);
-        //}
-
         LoadContacts();
         OnSortButtonPressed();
     }
@@ -244,10 +181,6 @@ public class Handler : MonoBehaviour
         {
             CurrentState = ScreenState.MainMenu;
         }
-        //if (Input.GetKeyDown(KeyCode.D))
-        //{
-        //    PlayerPrefs.DeleteAll();
-        //}
     }
     #endregion
     #region Contacts Methods
@@ -345,14 +278,6 @@ public class Handler : MonoBehaviour
         }
         activeContactHolders.Clear();
     }
-    //private void CloseAllScreens()
-    //{
-    //    contactsViewScreenGO.SetActive(false);
-    //    contactScreen.gameObject.SetActive(false);
-    //    createContactScreenGO.SetActive(false);
-    //    // mainMenuUpperPanelGO.SetActive(false);
-    //    if (searching) OnSearchButtonPressed();
-    //}
 
     #endregion
 
@@ -403,9 +328,6 @@ public class Handler : MonoBehaviour
         if (searching) OnSearchButtonPressed();
         CurrentState = ScreenState.ContactCreationScreen;
         CreateContactScreenComponent.CreateContactWindow();
-        //createContactScreen.
-
-
     }
 
     public void OnSearchButtonPressed()
@@ -438,16 +360,14 @@ public class Handler : MonoBehaviour
 
         if (value == "")
         {
-            //show normal contacts
             LoadContacts();
-            // SortContacts(currentSortMethod); // this already Updates List
         }
         else
         {
             //can use this list.. (is actually tempContacts in phoneData
             contacts = PhoneData.GetContactsByText(value);
-            // UpdateContactsList();
         }
+
         SortContacts(currentSortMethod); // Sorts and updates
     }
 

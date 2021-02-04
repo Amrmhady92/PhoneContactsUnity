@@ -94,7 +94,6 @@ public class CreateContactScreen : MonoBehaviour
         insertedData_2 = "";
         return UpdateScreen();
     }
-
     private bool UpdateScreen()
     {
         if (contact == null) return false;
@@ -158,7 +157,6 @@ public class CreateContactScreen : MonoBehaviour
         }
         return true;
     }
-
     public void OnDropDownListSelect(int index)
     {
         selectedType = (DetailType)index;

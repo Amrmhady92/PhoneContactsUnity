@@ -23,21 +23,21 @@ In the Contact Creation screen, you can delete entered details by pressing on th
 
 The contacts are saved under "\Android\data\com.JuxtapoZition.PhoneBookUnity\files\Saves", save files are not named after the contacts, save files have the extention ".cntct"
 	
--Viewing Contacts:
+#Viewing Contacts:
 	After creating contacts, you can preview available contacts by pressing on their names in the Main screen, you will then be moved to the View Contact screen, pressing on the Phone numbers, Emails or links should start a call or go to the link provided.
 
 pressing the [Edit] button will send you to the Contact Creation screen with the filled contact details, so you can add or remove details from it.
 
 pressing the [Remove] button will delete the contact from the list, a prompt will show to confirm deletion.
 
--Searching Contacts:
+#Searching Contacts:
 	On the top right of the screen a [Search] button can pressed to show the search bar.
 Input given to search bar will search for everything a contact may have, Name, Phone, Email, Link, or Description. any match should appear in the list in the Main screen.
 
--Sorting Contacts:
+#Sorting Contacts:
 	You can sort contacts by Name (a: ascending, D: descending orders) or by Date Added (ascending or descending), also works on searched contacts.
 
--Navigation:
+#Navigation:
 	Using the Back button on your android device, should return to Main screen if you are in the View Contact screen.
 Leaving the Create Contact Screen is only doable throught the [Finish] or [Cancel] buttons.
 

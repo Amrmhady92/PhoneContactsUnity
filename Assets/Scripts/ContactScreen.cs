@@ -37,11 +37,6 @@ public class ContactScreen : MonoBehaviour
 
         //Name
         contactNameText.text = contact.name + " " + contact.lastname;
-        //if(MakeContact(DetailType.Name) == false)
-        //{
-        //    Debug.LogError("Failed to Create Detail");
-        //    return false;
-        //}
 
         //Phones
         for (int i = 0; i < contact.phoneNumbers.Count; i++)

@@ -42,6 +42,7 @@ public class Contact
         this.dateAdded = DateTime.Today;
     }
 
+    //Because I don't trust the == 
     public bool CompareContact(Contact c)
     {
         if (c == null) return false;
