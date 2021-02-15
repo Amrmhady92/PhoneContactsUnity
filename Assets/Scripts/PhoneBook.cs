@@ -325,19 +325,15 @@ public class PhoneBook : MonoBehaviour
         switch (currentSortMethod)
         {
             case SortMethod.AlphabeticallyA:
-                //sortingButtonText.text = "Alph a";
                 sortingButtonImage.sprite = sortingAlphaAscIcon;
                 break;
             case SortMethod.AlphabeticallyD:
-                //sortingButtonText.text = "Alph D";
                 sortingButtonImage.sprite = sortingAlphaDscIcon;
                 break;
             case SortMethod.DateA:
-                //sortingButtonText.text = "Date a";
                 sortingButtonImage.sprite = sortingDateAscIcon;
                 break;
             case SortMethod.DateD:
-                //sortingButtonText.text = "Date D";
                 sortingButtonImage.sprite = sortingDateDscIcon;
                 break;
         }
