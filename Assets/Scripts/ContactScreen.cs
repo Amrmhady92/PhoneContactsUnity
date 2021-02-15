@@ -10,10 +10,25 @@ public class ContactScreen : MonoBehaviour
     [SerializeField] private UIMover confirmDeleteWindow;
     [SerializeField] private GameObject[] screenButtons;
 
+    [SerializeField] private UIMover[] contactViewScreenMovers;
+
     private List<GameObject> activeObjects;
     private ContactDetail cDetail = null;
     private GameObject detailObject = null;
     private Contact contact;
+
+    public UIMover[] ContactViewScreenMovers
+    {
+        get
+        {
+            return contactViewScreenMovers;
+        }
+
+        private set
+        {
+            contactViewScreenMovers = value;
+        }
+    }
 
     public bool DisplayContact(Contact contact)
     {
@@ -124,8 +139,9 @@ public class ContactScreen : MonoBehaviour
 
     public void OnDeleteConfirm()
     {
-        Handler.Instance.PhoneData.RemoveContact(contact);
-        Handler.Instance.CurrentState = ScreenState.MainMenu;
+        //Handler.Instance.PhoneData.RemoveContact(contact);
+        ContactManager.RemoveContact(contact);
+        PhoneBook.Instance.CurrentState = ScreenState.MainMenu;
         confirmDeleteWindow.HideObject();
         EnableDiableButtons(true);
     }
@@ -138,10 +154,10 @@ public class ContactScreen : MonoBehaviour
 
     public void OnEditContactButtonPressed()
     {
-        Handler.Instance.CurrentState = ScreenState.ContactCreationScreen;
-        if (Handler.Instance.CreateContactScreenComponent.CreateContactWindow(contact) == false)
+        PhoneBook.Instance.CurrentState = ScreenState.ContactCreationScreen;
+        if (PhoneBook.Instance.CreateContactScreenComponent.CreateContactWindow(contact) == false)
         {
-            Handler.Instance.CurrentState = ScreenState.MainMenu;
+            PhoneBook.Instance.CurrentState = ScreenState.MainMenu;
         }
     }
 

@@ -20,27 +20,32 @@ public enum SortMethod
     Count
 }
 
-public class Handler : MonoBehaviour
+public class PhoneBook : MonoBehaviour
 {
 
-    public bool testerbool = true;
     [SerializeField] private Pooler contactHolderPool;
     [SerializeField] private float clickCoolDown = 0.2f;
-    [SerializeField] private GameData phoneData;
+
 
     [SerializeField] private TextMeshProUGUI noContactsText;
 
-    [SerializeField] private GameObject contactsViewScreenGO;
-    [SerializeField] private GameObject createContactScreenGO;
     [SerializeField] private GameObject mainMenuUpperPanelGO;
     [SerializeField] private UIMover upperPanelMover;
 
     [SerializeField] private UIMover[] mainMenuMovers;
-    [SerializeField] private UIMover[] contactViewScreenMovers;
-    [SerializeField] private UIMover[] contactCreationScreenMovers;
 
-    [SerializeField] private ContactScreen contactScreen;
-    [SerializeField] private CreateContactScreen createContactScreen;
+    private ContactScreen contactScreen;
+    private CreateContactScreen createContactScreen;
+
+    [SerializeField] private GameObject contactScreenPrefab;
+    [SerializeField] private GameObject createContactScreenPrefab;
+
+    //private ContactManager manager;
+    private Contact contact;
+    private ContactHolder holder;
+    private GameObject holderObject;
+    private bool canClick = true;
+
 
 
 
@@ -53,12 +58,18 @@ public class Handler : MonoBehaviour
     //
     //
     [SerializeField] private TextMeshProUGUI sortingButtonText;
+    [SerializeField] private Image sortingButtonImage;
+    [SerializeField] private Sprite sortingAlphaAscIcon;
+    [SerializeField] private Sprite sortingAlphaDscIcon;
+    [SerializeField] private Sprite sortingDateAscIcon;
+    [SerializeField] private Sprite sortingDateDscIcon;
 
-    private List<Contact> contacts;
+
+    private List<Contact> contacts; // a secondary list // next step dump this list and just use the Manager's list
     private List<GameObject> activeContactHolders;
 
-    private static Handler instance;
-    public static Handler Instance
+    private static PhoneBook instance;
+    public static PhoneBook Instance
     {
         get
         {
@@ -67,19 +78,19 @@ public class Handler : MonoBehaviour
     }
 
 
-    public GameData PhoneData
-    {
-        get
-        {
-            return phoneData;
-        }
+    //public GameData PhoneData
+    //{
+    //    get
+    //    {
+    //        return phoneData;
+    //    }
 
-        private set
-        {
-            phoneData = value;
-        }
-    }
-
+    //    private set
+    //    {
+    //        phoneData = value;
+    //    }
+    //}
+    #region Properties
     public ScreenState CurrentState
     {
         get
@@ -93,8 +104,10 @@ public class Handler : MonoBehaviour
             switch (currentState)
             {
                 case ScreenState.MainMenu:
-                    HideMovers(contactViewScreenMovers);
-                    HideMovers(contactCreationScreenMovers);
+                    HideMovers(contactScreen.ContactViewScreenMovers);
+                    HideMovers(createContactScreen.ContactCreationScreenMovers);
+                    //HideMovers(contactViewScreenMovers);
+                   // HideMovers(contactCreationScreenMovers);
                     StartCoroutine(WaitThenDo(0.5f, () =>
                     {
                         UnHideMovers(mainMenuMovers);
@@ -107,18 +120,23 @@ public class Handler : MonoBehaviour
                 case ScreenState.ContactDetailScreen:
 
                     HideMovers(mainMenuMovers);
-                    HideMovers(contactCreationScreenMovers);
+                    HideMovers(createContactScreen.ContactCreationScreenMovers);
+
+                    //HideMovers(contactCreationScreenMovers);
                     StartCoroutine(WaitThenDo(0.5f, () =>
                     {
-                        UnHideMovers(contactViewScreenMovers);
+                        //UnHideMovers(contactViewScreenMovers);
+                        UnHideMovers(contactScreen.ContactViewScreenMovers);
                     }));
                     break;
                 case ScreenState.ContactCreationScreen:
-                    HideMovers(contactViewScreenMovers);
+                    //HideMovers(contactViewScreenMovers);
+                    HideMovers(contactScreen.ContactViewScreenMovers);
                     HideMovers(mainMenuMovers);
                     StartCoroutine(WaitThenDo(0.5f, () =>
                     {
-                        UnHideMovers(contactCreationScreenMovers);
+                        //UnHideMovers(contactCreationScreenMovers);
+                        UnHideMovers(createContactScreen.ContactCreationScreenMovers);
                     }));
                     break;
                 default:
@@ -140,24 +158,22 @@ public class Handler : MonoBehaviour
         }
     }
 
-    private void HideMovers(UIMover[] movers, float speed = -1)
+    public List<Contact> Contacts
     {
-        for (int i = 0; i < movers.Length; i++)
+        get
         {
-            movers[i].HideObject(speed);
+            return contacts;
+        }
+
+        private set
+        {
+            contacts = value;
         }
     }
 
-    private void UnHideMovers(UIMover[] movers, float speed = -1)
-    {
-        for (int i = 0; i < movers.Length; i++)
-        {
-            movers[i].UnHideObject(speed);
-        }
-    }
 
-    private bool canClick = true;
 
+    #endregion
 
     #region MonoBehavior Methods
     ///Methods////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,12 +181,19 @@ public class Handler : MonoBehaviour
     {
         if (instance == null) instance = this;
 
-        contacts = new List<Contact>();
+        //contacts = new List<Contact>();
+        // manager = new ContactManager();
+        //ContactManager.Init();
     }
 
     private void Start()
     {
-        PhoneData.Init();
+        RectTransform rectT = this.GetComponentInChildren<RectTransform>();
+        //PhoneData.Init();
+        contactScreen = GameObject.Instantiate(contactScreenPrefab, rectT).GetComponent<ContactScreen>();
+        CreateContactScreenComponent = GameObject.Instantiate(createContactScreenPrefab, rectT).GetComponent<CreateContactScreen>();
+        
+
         LoadContacts();
         OnSortButtonPressed();
     }
@@ -187,21 +210,21 @@ public class Handler : MonoBehaviour
     public void SortContacts(SortMethod sortMethod)
     {
 
-        if (contacts != null && contacts.Count > 0)
+        if (Contacts != null && Contacts.Count > 0)
         {
             switch (sortMethod)
             {
                 case SortMethod.AlphabeticallyA:
-                    contacts.Sort((a, b) => a.name.CompareTo(b.name));
+                    Contacts.Sort((a, b) => a.name.CompareTo(b.name));
                     break;
                 case SortMethod.AlphabeticallyD:
-                    contacts.Sort((a, b) => b.name.CompareTo(a.name));
+                    Contacts.Sort((a, b) => b.name.CompareTo(a.name));
                     break;
                 case SortMethod.DateA:
-                    contacts.Sort((a, b) => a.dateAdded.CompareTo(b.dateAdded));
+                    Contacts.Sort((a, b) => a.dateAdded.CompareTo(b.dateAdded));
                     break;
                 case SortMethod.DateD:
-                    contacts.Sort((a, b) => b.dateAdded.CompareTo(a.dateAdded));
+                    Contacts.Sort((a, b) => b.dateAdded.CompareTo(a.dateAdded));
                     break;
             }
         }
@@ -210,7 +233,7 @@ public class Handler : MonoBehaviour
     }
     private void LoadContacts()
     {
-        contacts = new List<Contact>(phoneData.GetAllContacts());
+        Contacts = new List<Contact>(ContactManager.Contacts);// replicating the list so we wont dmg the already build list
     }
     #endregion
 
@@ -230,18 +253,14 @@ public class Handler : MonoBehaviour
     }
     private void UpdateContactsList()
     {
-        if (contacts == null) return;
+        if (Contacts == null) return;
 
-        noContactsText.text = contacts.Count == 0 ? "Phone Book Empty" : "";
-
+        noContactsText.text = Contacts.Count == 0 ? "Phone Book Empty" : "";
         DeactivateHolders();
-        Contact contact;
-        ContactHolder holder;
-        GameObject holderObject;
 
-        for (int i = 0; i < contacts.Count; i++)
+        for (int i = 0; i < Contacts.Count; i++)
         {
-            contact = contacts[i];
+            contact = Contacts[i];
             if (contact == null) continue;
 
             //Safety Checks
@@ -264,7 +283,6 @@ public class Handler : MonoBehaviour
             activeContactHolders.Add(holderObject);
         }
     }
-
     private void DeactivateHolders()
     {
         if (activeContactHolders == null)
@@ -277,6 +295,21 @@ public class Handler : MonoBehaviour
             activeContactHolders[i].SetActive(false);
         }
         activeContactHolders.Clear();
+    }
+
+    private void HideMovers(UIMover[] movers, float speed = -1)
+    {
+        for (int i = 0; i < movers.Length; i++)
+        {
+            movers[i].HideObject(speed);
+        }
+    }
+    private void UnHideMovers(UIMover[] movers, float speed = -1)
+    {
+        for (int i = 0; i < movers.Length; i++)
+        {
+            movers[i].UnHideObject(speed);
+        }
     }
 
     #endregion
@@ -292,16 +325,20 @@ public class Handler : MonoBehaviour
         switch (currentSortMethod)
         {
             case SortMethod.AlphabeticallyA:
-                sortingButtonText.text = "Alph a";
+                //sortingButtonText.text = "Alph a";
+                sortingButtonImage.sprite = sortingAlphaAscIcon;
                 break;
             case SortMethod.AlphabeticallyD:
-                sortingButtonText.text = "Alph D";
+                //sortingButtonText.text = "Alph D";
+                sortingButtonImage.sprite = sortingAlphaDscIcon;
                 break;
             case SortMethod.DateA:
-                sortingButtonText.text = "Date a";
+                //sortingButtonText.text = "Date a";
+                sortingButtonImage.sprite = sortingDateAscIcon;
                 break;
             case SortMethod.DateD:
-                sortingButtonText.text = "Date D";
+                //sortingButtonText.text = "Date D";
+                sortingButtonImage.sprite = sortingDateDscIcon;
                 break;
         }
         SortContacts(currentSortMethod);
@@ -365,7 +402,7 @@ public class Handler : MonoBehaviour
         else
         {
             //can use this list.. (is actually tempContacts in phoneData
-            contacts = PhoneData.GetContactsByText(value);
+            Contacts = ContactManager.GetContactsByText(value);
         }
 
         SortContacts(currentSortMethod); // Sorts and updates

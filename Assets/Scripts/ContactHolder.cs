@@ -21,7 +21,7 @@ public class ContactHolder : MonoBehaviour
         }
         contact = c;
 
-        contactNameText.text = contact.name;
+        contactNameText.text = contact.name + " " + contact.lastname;
         if (contact.phoneNumbers != null && contact.phoneNumbers.Count > 0)
         {
             contactMainNumberText.text = contact.phoneNumbers[0].number.ToString();
@@ -39,7 +39,7 @@ public class ContactHolder : MonoBehaviour
 
     public void OnHolderClicked()
     {
-        Handler.Instance.OnContactClicked(contact);
+        PhoneBook.Instance.OnContactClicked(contact);
     }
 
 }

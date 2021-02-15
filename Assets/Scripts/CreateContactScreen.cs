@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
@@ -9,7 +9,7 @@ public class CreateContactScreen : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameText;
 
 
-
+    [SerializeField] private UIMover addDetailWindow;
     [SerializeField] private UIMover addNameWindow;
     [SerializeField] private UIMover addPhoneWindow;
     [SerializeField] private UIMover addEmailWindow;
@@ -19,11 +19,16 @@ public class CreateContactScreen : MonoBehaviour
     [SerializeField] private UIMover confirmDeleteWindow;
     [SerializeField] private UIMover warningWindow;
     [SerializeField] private TextMeshProUGUI warningWindowText;
+    [SerializeField] private GameObject blocker;
+
 
     [SerializeField] private Pooler contactDetailPool;
     [SerializeField] private GameObject addContactDetailButtonGO;
     [SerializeField] private GameObject finishButtonGO;
     [SerializeField] private GameObject cancelButtonGO;
+
+    [SerializeField] private UIMover[] contactCreationScreenMovers;
+
 
     private List<GameObject> activeObjects;
     private ContactDetail cDetail = null;
@@ -35,6 +40,8 @@ public class CreateContactScreen : MonoBehaviour
     private string insertedData_2;
     private PhoneNumberType insertedPhoneNumberType;
 
+    private Action warningClosedAction;
+    private bool deleteButtonDisabled = false;
 
     private DetailType selectedType;
 
@@ -63,6 +70,18 @@ public class CreateContactScreen : MonoBehaviour
         }
     }
 
+    public UIMover[] ContactCreationScreenMovers
+    {
+        get
+        {
+            return contactCreationScreenMovers;
+        }
+
+        private set
+        {
+            contactCreationScreenMovers = value;
+        }
+    }
 
     private void Update()
     {
@@ -93,6 +112,8 @@ public class CreateContactScreen : MonoBehaviour
 
         insertedData_1 = "";
         insertedData_2 = "";
+        deleteButtonDisabled = false;
+
         return UpdateScreen();
     }
     private bool UpdateScreen()
@@ -158,6 +179,19 @@ public class CreateContactScreen : MonoBehaviour
         }
         return true;
     }
+
+
+    public void OnAddDetailButtonPressed()
+    {
+        deleteButtonDisabled = true;
+        EnableDisableButtons(false);
+        addDetailWindow.UnHideObject(0.4f);
+    }
+    public void OnCloseAddDetailWindowPressed()
+    {
+        deleteButtonDisabled = false;
+        EnableDisableButtons(true);
+    }
     public void OnDropDownListSelect(int index)
     {
         selectedType = (DetailType)index;
@@ -210,19 +244,48 @@ public class CreateContactScreen : MonoBehaviour
                     contact.phoneNumbers.Add(pNum);
                     MakeContact(DetailType.Phone, contact.phoneNumbers.Count - 1);
                 }
+                else
+                {
+                    SetWarning("Number Already Exists");
+                    return;
+                }
                 break;
             case DetailType.Email:
+
+                if(insertedData_1.Contains("@") == false)
+                {
+                    SetWarning("Email has no @");
+                    return;
+                }
+                if (insertedData_1.IndexOf("@") != insertedData_1.LastIndexOf("@"))
+                {
+                    SetWarning("Email has multiple @");
+                    return;
+                }
+
+
                 if (contact.emails.Contains(insertedData_1) == false)
                 {
                     contact.emails.Add(insertedData_1);
                     MakeContact(DetailType.Email, contact.emails.Count - 1);
                 }
+                else
+                {
+                    SetWarning("Email Already Exists");
+                    return;
+                }
                 break;
+
             case DetailType.Link:
                 if(contact.links.Contains(insertedData_1) == false)
                 {
                     contact.links.Add(insertedData_1);
                     MakeContact(DetailType.Link, contact.links.Count - 1);
+                }
+                else
+                {
+                    SetWarning("Link Already Exists");
+                    return;
                 }
                 break;
             case DetailType.Description:
@@ -231,20 +294,27 @@ public class CreateContactScreen : MonoBehaviour
                 {
                     contact.description = insertedData_1;
                 }
+
                 if(contact.description != "")
                 {
                     MakeContact(DetailType.Description);
+                }
+                else
+                {
+                    SetWarning("Description Not Changed");
+                    return;
                 }
                 break;
         }
         if (lastMover != null) lastMover.HideObject();
         UpdateScreen();
-        finishButtonGO.SetActive(true);
+        EnableDisableButtons(true);
+        deleteButtonDisabled = false;
     }
     public void OnCancelButtonPressed()
     {
         contact = null;
-        Handler.Instance.CurrentState = ScreenState.MainMenu;
+        PhoneBook.Instance.CurrentState = ScreenState.MainMenu;
         EnableDisableButtons(true);
     }
     public void EnableDisableButtons(bool onOff)
@@ -258,29 +328,32 @@ public class CreateContactScreen : MonoBehaviour
         if (contact.name + contact.lastname == "")
         {
             EnableDisableButtons(false); // just to make sure
-            warningWindowText.text = "Contact Has No Name";
-            warningWindow.UnHideObject();
+            SetWarning("Contact Has No Name", () => {
+                EnableDisableButtons(true);
+            });
             return;
         }
-        if (Handler.Instance.PhoneData.FindExactContact(contact) != null)
+        if (ContactManager.FindExactContact(contact) != null)
         {
             EnableDisableButtons(false); // just to make sure
-            warningWindowText.text = "Contact Already Exists";
-            warningWindow.UnHideObject();
+            SetWarning("Contact Already Exists", () => {
+                EnableDisableButtons(true);
+            });
             return;
         }
 
         if (oldContact != null)
         {
-            Handler.Instance.PhoneData.RemoveContact(oldContact);
+            ContactManager.RemoveContact(oldContact);
         }
         if(contact != null && contact.name != "")
         {
             contact.dateAdded = System.DateTime.Now;
-            Handler.Instance.PhoneData.AddContact(contact);
+            ContactManager.AddContact(contact);
+
         }
         EnableDisableButtons(true);
-        Handler.Instance.CurrentState = ScreenState.MainMenu;
+        PhoneBook.Instance.CurrentState = ScreenState.MainMenu;
     }
     private bool MakeContact(DetailType type, int index = 0)
     {
@@ -356,14 +429,35 @@ public class CreateContactScreen : MonoBehaviour
     }
     private void SetDetailDelete(ContactDetail detail)
     {
+        if (deleteButtonDisabled) return;
+        deleteButtonDisabled = true;
+
         cDetail = detail;
         confirmDeleteWindow.UnHideObject();
         EnableDisableButtons(false);
     }
     public void ConfirmDeleteButtonPressed()
     {
+        deleteButtonDisabled = false;
         EnableDisableButtons(true);
         DeleteDetail(cDetail);
         cDetail = null;
+    }
+    public void OnDeleteCancel()
+    {
+        deleteButtonDisabled = false;
+        EnableDisableButtons(true);
+    }
+
+    private void SetWarning(string warningMessage, Action warningAction = null)
+    {
+        warningWindowText.text = warningMessage;
+        warningWindow.UnHideObject();
+        blocker.SetActive(true);
+        warningClosedAction = warningAction;
+    }
+    public void WarningWindowClosed()
+    {
+        warningClosedAction?.Invoke();
     }
 }
