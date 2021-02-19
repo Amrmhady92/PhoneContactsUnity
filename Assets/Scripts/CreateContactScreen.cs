@@ -92,6 +92,7 @@ public class CreateContactScreen : MonoBehaviour
                 lastMover.HideObject();
             }
             EnableDisableButtons(true);
+            warningWindow.HideObject();
             UpdateScreen();
         }
     }

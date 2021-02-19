@@ -5,70 +5,60 @@ using UnityEngine;
 
 public class UIFitter : MonoBehaviour
 {
-    //For Stretch 
-    [SerializeField] float widthPercentage = 0;
-    [SerializeField] bool widthResize = false;
-    [SerializeField] float heightPercentage = 0;
-    [SerializeField] bool heightResize = false;
+    [SerializeField] float landscapeWidth = 1900;
+    [SerializeField] float portraitWidth = 1000;
+    [SerializeField] float landscapeHeight = 120;
+    [SerializeField] float portraitHeight = 220;
+    [SerializeField] bool setWidth = false;
+    [SerializeField] bool setHeight = false;
 
-    //[SerializeField] float xPercentage = 0;
-    //[SerializeField] bool xPosition = false;
-    //[SerializeField] float yPercentage = 0;
-    //[SerializeField] bool yPosition = false;
 
-    private float left, right, top, bottom;
-
-    Vector2 v2;
-    Vector2 v3;
-    Rect rec;
-    private RectTransform rectTransform;
-    private LayoutElement element;
+    //RectTransform rectT;
+    //Vector2 v;
+    LayoutElement layoutElement;
     private void Start()
     {
-        UIFitterHandler.AddToFitter(this);
-        rectTransform = this.GetComponent<RectTransform>();
-        element = this.GetComponent<LayoutElement>();
-
+        UIScreenListener.OnScreenSizeChange.AddListener(UpdateFitter);
+        //rectT = this.GetComponent<RectTransform>();
+        layoutElement = this.GetComponent<LayoutElement>();
     }
     public void UpdateFitter()
     {
-        v2 = rectTransform.sizeDelta;
-        if (widthResize)
+        //v = rectT.sizeDelta;
+        bool landscape = UIScreenListener.Width / UIScreenListener.Height > 1;
+        if (setWidth)
         {
-            v2.x = UIFitterHandler.Width * widthPercentage;
-            if(element != null)
+            if (landscape)
             {
-                element.minWidth = v2.x;
+                // v.x = landscapeWidth;
+                layoutElement.preferredWidth = landscapeWidth;
+            }
+            else
+            {
+                //v.x = portraitWidth;
+                layoutElement.preferredWidth = portraitWidth;
             }
         }
-        if (heightResize)
+
+        if (setHeight)
         {
-            v2.y = UIFitterHandler.Height * heightPercentage;
-            if (element != null)
+            if (landscape)
             {
-                element.minHeight = v2.y;
+                //v.y = landscapeHeight;
+                layoutElement.preferredHeight = landscapeHeight;
+            }
+            else
+            {
+                //v.y = portraitHeight;
+                layoutElement.preferredHeight = portraitHeight;
             }
         }
-        rectTransform.sizeDelta = v2;
-
-        //v3 = rectTransform.localPosition;
-        //if (xPosition)
-        //{
-        //    v3.x = UIFitterHandler.Width * xPercentage;
-        //}
-        //if (yPosition)
-        //{
-        //    v3.y = UIFitterHandler.Height * yPercentage;
-        //}
-        //rectTransform.localPosition = v3;
-
-
-        //rectTransform.rect.Set(v3.x, v3.y, v2.x, v2.y);
-
+        //rectT.sizeDelta = v;
     }
 
     private void OnDestroy()
     {
-        UIFitterHandler.RemoveFromFitter(this);
+        UIScreenListener.OnScreenSizeChange.RemoveListener(UpdateFitter);
+
     }
 }

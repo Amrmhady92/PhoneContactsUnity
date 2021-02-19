@@ -374,9 +374,7 @@ public class PhoneBook : MonoBehaviour
             //Vector2 offSize = new Vector2(0, searchBar.sizeDelta.y);
             //searchBar.LeanSize(offSize, 0.2f);
             searchBar.LeanScaleX(0, 0.2f);
-
             LoadContacts();
-            UpdateContactsList();
         }
         else
         {
@@ -386,6 +384,7 @@ public class PhoneBook : MonoBehaviour
             //searchBar.LeanSize(offSize, 0.2f);
             searchBar.LeanScaleX(1, 0.2f);
         }
+        SortContacts(currentSortMethod);
     }
     public void OnSearchBarValueChanged(string value)
     {

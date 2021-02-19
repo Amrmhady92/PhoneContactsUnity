@@ -26,6 +26,11 @@ public class UIMover : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Hides the Mover , if setSpeed > 0 will use the speed given, else will use the speed specified in the editor 
+    /// </summary>
+    /// <param name="setSpeed"></param>
     public void HideObject(float setSpeed = -1)
     {
         if (hidden) return; 
@@ -60,6 +65,8 @@ public class UIMover : MonoBehaviour
         hidden = false;
     }
 
+
+    //in case the screen changes orientation , will need to fix the start pos and off pos according to the new orientation's height.
     public void ScreenChangedEvent()
     {
         startPos.y = Display.displays[0].renderingHeight * startPosPerc;
