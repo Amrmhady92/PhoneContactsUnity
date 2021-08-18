@@ -180,16 +180,36 @@ public class PhoneBook : MonoBehaviour
     private void Awake()
     {
         if (instance == null) instance = this;
-
-        //contacts = new List<Contact>();
-        // manager = new ContactManager();
-        //ContactManager.Init();
     }
 
     private void Start()
     {
         RectTransform rectT = this.GetComponentInChildren<RectTransform>();
-        //PhoneData.Init();
+
+        //If we already have either screens, we disable them and load new ones
+        ContactScreen contScreen = this.gameObject.GetComponentInChildren<ContactScreen>();
+        if (contScreen != null)
+        {
+            Destroy(contScreen.gameObject);
+            Debug.LogError("Contact Details Screen exists , Destroyed, Make sure to remove before build");
+        }
+        CreateContactScreen createContScreen = this.gameObject.GetComponentInChildren<CreateContactScreen>();
+        if(createContScreen != null)
+        {
+            Destroy(createContScreen.gameObject);
+            Debug.LogError("Create Contact Screen exists , Destroyed, Make sure to remove before build");
+        }
+
+        if(contactScreenPrefab == null)
+        {
+            Debug.LogError("No Contact Detail Screen prefab referenced");
+            return;
+        }
+        if (createContactScreenPrefab == null)
+        {
+            Debug.LogError("No Create Contact Screen prefab referenced");
+            return;
+        }
         contactScreen = GameObject.Instantiate(contactScreenPrefab, rectT).GetComponent<ContactScreen>();
         CreateContactScreenComponent = GameObject.Instantiate(createContactScreenPrefab, rectT).GetComponent<CreateContactScreen>();
         
@@ -233,7 +253,7 @@ public class PhoneBook : MonoBehaviour
     }
     private void LoadContacts()
     {
-        Contacts = new List<Contact>(ContactManager.Contacts);// replicating the list so we wont dmg the already build list
+        Contacts = new List<Contact>(ContactManager.Contacts);//replicating the list so we wont dmg the already build list
     }
     #endregion
 

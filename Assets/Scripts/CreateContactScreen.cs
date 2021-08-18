@@ -20,6 +20,7 @@ public class CreateContactScreen : MonoBehaviour
     [SerializeField] private UIMover warningWindow;
     [SerializeField] private TextMeshProUGUI warningWindowText;
     [SerializeField] private GameObject blocker;
+    [SerializeField] private TMP_InputField emailInputField;
 
 
     [SerializeField] private Pooler contactDetailPool;
@@ -136,7 +137,7 @@ public class CreateContactScreen : MonoBehaviour
 
         //Name
 
-         nameText.text ="Name: " + contact.name + " " + contact.lastname;
+         nameText.text ="Name: \n" + contact.name + " " + contact.lastname;
         
 
         //Phones
@@ -240,6 +241,11 @@ public class CreateContactScreen : MonoBehaviour
                 PhoneNumber pNum = new PhoneNumber();
                 pNum.type = insertedPhoneNumberType;
                 pNum.number = insertedData_1;
+                if(insertedData_1 == "")
+                {
+                    SetWarning("No Number Entered");
+                    return;
+                }
                 if(contact.phoneNumbers.Contains(pNum) == false)
                 {
                     contact.phoneNumbers.Add(pNum);
@@ -252,8 +258,15 @@ public class CreateContactScreen : MonoBehaviour
                 }
                 break;
             case DetailType.Email:
+                if (insertedData_1 == "")
+                {
+                    SetWarning("No Value Entered");
+                    return;
+                }
 
-                if(insertedData_1.Contains("@") == false)
+                insertedData_1.Replace(" ", "");
+
+                if (insertedData_1.Contains("@") == false)
                 {
                     SetWarning("Email has no @");
                     return;
@@ -278,7 +291,16 @@ public class CreateContactScreen : MonoBehaviour
                 break;
 
             case DetailType.Link:
-                if(contact.links.Contains(insertedData_1) == false)
+
+                if (insertedData_1 == "")
+                {
+                    SetWarning("No Value Entered");
+                    return;
+                }
+
+                insertedData_1.Replace(" ", "");
+
+                if (contact.links.Contains(insertedData_1) == false)
                 {
                     contact.links.Add(insertedData_1);
                     MakeContact(DetailType.Link, contact.links.Count - 1);
@@ -291,13 +313,17 @@ public class CreateContactScreen : MonoBehaviour
                 break;
             case DetailType.Description:
 
+
+                if (insertedData_1 == "")
+                {
+                    SetWarning("No Value Entered");
+                    return;
+                }
+
+
                 if (contact.description != insertedData_1) 
                 {
                     contact.description = insertedData_1;
-                }
-
-                if(contact.description != "")
-                {
                     MakeContact(DetailType.Description);
                 }
                 else
@@ -461,4 +487,17 @@ public class CreateContactScreen : MonoBehaviour
     {
         warningClosedAction?.Invoke();
     }
+
+    /// <summary>
+    /// For Email and Links (no spaces allowed)
+    /// </summary>
+    /// <param name="inputfield"></param>
+    public void OnValueChangedWithoutSpaces(TMP_InputField inputfield)
+    {
+        if (inputfield == null) return;
+
+        inputfield.text = inputfield.text.Replace(" ", "");
+        InsertedData_1 = inputfield.text;
+    }
+
 }
